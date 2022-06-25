@@ -4,8 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MockSocket.HoleServer;
 
+var switchMappings = new Dictionary<string, string>
+{
+    { "-p", "ListenPort" }
+};
+
 var config = new ConfigurationBuilder()
-        .AddCommandLine(args)
+        .AddCommandLine(args, switchMappings)
         .Build();
 
 var sp = new ServiceCollection()

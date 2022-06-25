@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using MockSocket.Core.Tcp;
 using System.Buffers;
 
@@ -14,37 +13,23 @@ namespace MockSocket.Core.Exchange
 
         public ExchangeConnection(ILogger<ExchangeConnection> logger)
         {
-            this.logger = logger ?? NullLogger<ExchangeConnection>.Instance;
+            this.logger = logger;
         }
 
         public async ValueTask ExchangeAsync(ITcpConnection srcConnection, ITcpConnection dstConnection, CancellationToken cancellationToken = default)
         {
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            cts.Token.Register(() => srcConnection.Dispose());
-            cts.Token.Register(() => dstConnection.Dispose());
+            using var dst = dstConnection;
+            using var src = srcConnection;
 
             logger.LogDebug($"连接{srcConnection}<=>{dstConnection}开始镜像...");
 
-            try
-            {
-                await Task.WhenAny(SwapMessageAsync(srcConnection, dstConnection, cts.Token), SwapMessageAsync(dstConnection, srcConnection, cts.Token));
-
-                logger.LogDebug($"连接{srcConnection}<=>{dstConnection}已中断");
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Exchange异常");
-            }
-            finally
-            {
-                cts.Cancel();
-            }
+            await Task.WhenAny(SwapMessageAsync(srcConnection, dstConnection, cancellationToken), SwapMessageAsync(dstConnection, srcConnection, cancellationToken))
+                .ContinueWith(t => logger.LogDebug($"连接{srcConnection}<=>{dstConnection}已中断"));
         }
 
         public virtual async Task SwapMessageAsync(ITcpConnection send, ITcpConnection receive, CancellationToken cancellationToken)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(4096);
+            var buffer = ArrayPool<byte>.Shared.Rent(2048);
 
             try
             {

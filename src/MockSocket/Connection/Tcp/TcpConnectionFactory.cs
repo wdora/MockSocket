@@ -5,7 +5,7 @@ namespace MockSocket.Core.Tcp
 {
     public class TcpClientConnectionFactory
     {
-        public async ValueTask<TcpConnection> CreateAsync(IPEndPoint remoteEP, CancellationToken cancellationToken = default)
+        public async ValueTask<TcpConnection> CreateAsync(EndPoint remoteEP, CancellationToken cancellationToken = default)
         {
             var client = new TcpClientConnection();
 

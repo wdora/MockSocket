@@ -5,8 +5,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MockSocket.HoleClient;
 
+var switchMappings = new Dictionary<string, string>
+{
+    { "-p", "HoleAppServerPort" },
+    { "-rs", "RealServer" },
+    { "-rsp", "RealServerPort" },
+    { "-hs", "HoleServer" }
+};
+
 var config = new ConfigurationBuilder()
-        .AddCommandLine(args)
+        .AddCommandLine(args, switchMappings)
         .Build();
 
 var sp = new ServiceCollection()

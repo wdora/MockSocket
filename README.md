@@ -2,6 +2,20 @@
 
 MockSocket是一个免费、开源、专注于内网穿透的高性能的反向代理应用, 支持TCP、UDP 等多种协议。可以将内网服务以安全、便捷的方式通过具有公网IP节点的中转暴露到公网。(后期尝试p2p 打洞)
 
+## 使用
+
+Server
+
+`.\MockSocket.Server.exe -p 9090`
+
+Agent
+
+`.\MockSocket.Agent.exe -p 8080 -rs localhost -rsp 80`
+
+Client
+
+`curl http://localhost:8080`
+
 ## 特点
 
 对比主流的frp(go), ngrok(c), 功能没那么多, 追求轻、快

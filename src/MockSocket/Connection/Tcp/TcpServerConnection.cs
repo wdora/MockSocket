@@ -44,7 +44,7 @@ namespace MockSocket.Connection.Tcp
 
     public class TcpClientConnection : TcpConnection, ITcpClientConnection
     {
-        public ValueTask ConnectAsync(IPEndPoint remoteEP, CancellationToken cancellationToken = default)
+        public ValueTask ConnectAsync(EndPoint remoteEP, CancellationToken cancellationToken = default)
         {
             return socket.ConnectAsync(remoteEP, cancellationToken);
         }

@@ -10,7 +10,7 @@ namespace MockSocket.HoleServer
 {
     public class HoleServerOption
     {
-        public int ListenPort { get; set; } = 10000;
+        public int ListenPort { get; set; } = 9090;
     }
 
     public class TcpHoleServer : IHoleServer

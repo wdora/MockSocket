@@ -14,6 +14,8 @@ namespace MockSocket.HoleClient
         {
             return services
                 .Configure<HoleClientOptions>(configuration)
+                .PostConfigure<HoleClientOptions>(options => options.HoleServerEP = new DnsEndPoint(options.HoleServer, options.HoleServerPort))
+                .PostConfigure<HoleClientOptions>(options => options.AgentRealServerEP = new DnsEndPoint(options.RealServer, options.RealServerPort))
                 .AddMediatR(typeof(ServiceCollectionExtension))
                 .AddTransient<IHoleClient, TcpHoleClient>()
                 .AddTransient<ITcpClientConnection, TcpClientConnection>()
@@ -24,12 +26,20 @@ namespace MockSocket.HoleClient
 
     public class HoleClientOptions
     {
-        public IPEndPoint HoleServerEP { get; set; } = new IPEndPoint(IPAddress.Loopback, 10000);
+        public string HoleServer { get; set; } = IPAddress.Loopback.ToString();
 
-        public int HoleAppServerPort { get; set; } = 8081;
+        public int HoleServerPort { get; set; } = 9090;
 
-        public IPEndPoint AgentRealServerEP { get; set; } = new IPEndPoint(IPAddress.Loopback, 9090);
+        public int HoleAppServerPort { get; set; } = 8080;
 
-        public TimeSpan HeartInterval { get; internal set; } = TimeSpan.FromSeconds(60);
+        public string RealServer { get; set; } = IPAddress.Loopback.ToString();
+
+        public int RealServerPort { get; set; } = 80;
+
+        public TimeSpan HeartInterval { get; set; } = TimeSpan.FromSeconds(60);
+
+        public EndPoint HoleServerEP { get; internal set; } = default!;
+
+        public EndPoint AgentRealServerEP { get; internal set; } = default!;
     }
 }

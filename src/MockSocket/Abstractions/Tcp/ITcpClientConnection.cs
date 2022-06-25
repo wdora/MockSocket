@@ -4,6 +4,6 @@ namespace MockSocket.Core.Tcp
 {
     public interface ITcpClientConnection : ITcpConnection
     {
-        ValueTask ConnectAsync(IPEndPoint remoteEP, CancellationToken cancellationToken = default);
+        ValueTask ConnectAsync(EndPoint remoteEP, CancellationToken cancellationToken = default);
     }
 }
