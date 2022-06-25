@@ -10,11 +10,11 @@ Server
 
 Agent
 
-`.\MockSocket.Agent.exe -p 8080 -rs localhost -rsp 80`
+`.\MockSocket.Agent.exe -p 8080 -rs localhost -rsp 80 -hs mocksocket.com -hsp 9090`
 
 Client
 
-`curl http://localhost:8080`
+`curl http://mocksocket.com:8080`
 
 ## 特点
 

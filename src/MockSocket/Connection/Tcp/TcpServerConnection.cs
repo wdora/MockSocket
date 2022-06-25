@@ -17,12 +17,24 @@ namespace MockSocket.Connection.Tcp
         public TcpConnection(Socket socket)
         {
             this.socket = socket;
+
+            LingerOption lingerOption = new LingerOption(false, 0);
+
+            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, lingerOption);
         }
 
         public bool IsConnected => socket.IsConnected();
 
         public virtual void Dispose()
         {
+            try
+            {
+                socket.Shutdown(SocketShutdown.Both);
+            }
+            finally
+            {
+                socket.Close();
+            }
             socket.Dispose();
         }
 
@@ -47,13 +59,6 @@ namespace MockSocket.Connection.Tcp
         public ValueTask ConnectAsync(EndPoint remoteEP, CancellationToken cancellationToken = default)
         {
             return socket.ConnectAsync(remoteEP, cancellationToken);
-        }
-
-        public override void Dispose()
-        {
-            socket.Disconnect(false);
-
-            base.Dispose();
         }
     }
 

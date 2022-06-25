@@ -18,6 +18,9 @@ namespace MockSocket.Core.Exchange
 
         public async ValueTask ExchangeAsync(ITcpConnection srcConnection, ITcpConnection dstConnection, CancellationToken cancellationToken = default)
         {
+            using var src = srcConnection;
+            using var dst = dstConnection;
+
             logger.LogDebug($"连接{srcConnection}<=>{dstConnection}开始镜像...");
 
             await Task.WhenAny(SwapMessageAsync(srcConnection, dstConnection, cancellationToken), SwapMessageAsync(dstConnection, srcConnection, cancellationToken));
@@ -37,6 +40,8 @@ namespace MockSocket.Core.Exchange
 
                     if (realSize == 0)
                         return;
+                    
+                    logger.LogDebug($"conn {receive} size: {realSize}");
 
                     await send.SendAsync(memory.Slice(0, realSize), cancellationToken);
                 }
@@ -45,9 +50,7 @@ namespace MockSocket.Core.Exchange
             {
                 ArrayPool<byte>.Shared.Return(buffer);
                 
-                logger.LogDebug($"连接{receive}已中断");
-
-                receive.Dispose();
+                logger.LogDebug($"conn {receive} closed");
             }
         }
     }

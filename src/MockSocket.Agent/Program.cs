@@ -10,7 +10,8 @@ var switchMappings = new Dictionary<string, string>
     { "-p", "HoleAppServerPort" },
     { "-rs", "RealServer" },
     { "-rsp", "RealServerPort" },
-    { "-hs", "HoleServer" }
+    { "-hs", "HoleServer" },
+    { "-hsp", "HoleServerPort" },
 };
 
 var config = new ConfigurationBuilder()
