@@ -45,6 +45,9 @@ namespace MockSocket.HoleServer
             {
                 var client = await server.AcceptAsync(cancellationToken);
 
+                if (client == null)
+                    break;
+
                 _ = HandleAgentAsync(client, cancellationToken);
             }
         }
