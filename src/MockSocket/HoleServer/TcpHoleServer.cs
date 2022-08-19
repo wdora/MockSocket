@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MockSocket.Abstractions.Tcp;
 using MockSocket.Core.Tcp;
+using MockSocket.Extensions;
 using MockSocket.Message;
 using System.Net;
 
@@ -28,10 +29,7 @@ namespace MockSocket.HoleServer
             this.logger = logger;
         }
 
-        public void Dispose()
-        {
-            server.Dispose();
-        }
+        public void Dispose() => server?.Dispose();
 
         public async ValueTask StartAsync(CancellationToken cancellationToken = default)
         {
@@ -56,9 +54,9 @@ namespace MockSocket.HoleServer
         {
             using var client = clientConnection;
 
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-            var cancellationToken = cts.Token;
-            _ = client.HeartBeatAsync(_ => cts.Cancel(), cancellationToken);
+            var (cts, cancellationToken) = token.CreateChildToken();
+
+            _ = client.OnClosedAsync(_ => cts.Cancel(), cancellationToken);
 
             while (true)
             {

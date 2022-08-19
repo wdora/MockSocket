@@ -96,7 +96,7 @@ namespace MockSocket.Abstractions.Tcp
             }
         }
 
-        public static async Task HeartBeatAsync(this ITcpConnection connection, Action<ITcpConnection> connectionClosed, CancellationToken cancellationToken)
+        public static async Task OnClosedAsync(this ITcpConnection connection, Action<ITcpConnection> connectionClosed, CancellationToken cancellationToken)
         {
             while (connection.IsConnected && !cancellationToken.IsCancellationRequested)
                 await Task.Delay(1);

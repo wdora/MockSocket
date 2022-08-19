@@ -8,6 +8,8 @@ namespace MockSocket.xUnit
 {
     public class BaseTest
     {
+        public const int ListenPort = 10000;
+
         protected IServiceProvider CreateServiceProvider<T>(T mockInstance, Dictionary<string, string> configSource = default)
             where T : class
         {
@@ -22,8 +24,6 @@ namespace MockSocket.xUnit
                 .AddLogging();
 
             return collection.BuildServiceProvider();
-
-            //return serviceProvider.GetService<IHoleServer>()!;
         }
     }
 }

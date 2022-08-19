@@ -31,11 +31,15 @@ namespace MockSocket.Connection.Tcp
             {
                 socket.Shutdown(SocketShutdown.Both);
             }
+            catch (Exception)
+            {
+                // todo
+            }
             finally
             {
                 socket.Close();
+                socket.Dispose();
             }
-            socket.Dispose();
         }
 
         public ValueTask<int> ReceiveAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
