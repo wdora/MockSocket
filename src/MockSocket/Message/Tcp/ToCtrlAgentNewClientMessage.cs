@@ -4,7 +4,6 @@ using MockSocket.Abstractions.Tcp;
 using MockSocket.Core.Exchange;
 using MockSocket.Core.Tcp;
 using MockSocket.HoleClient;
-using System.Net;
 
 namespace MockSocket.Message.Tcp
 {
@@ -32,16 +31,11 @@ namespace MockSocket.Message.Tcp
             var remoteEP = options.HoleServerEP;
             var realServerEP = options.AgentRealServerEP;
 
-            var agentDataClientTask = tcpClientConnectionFactory.CreateAsync(remoteEP, cancellationToken);
+            var agentDataClient = await tcpClientConnectionFactory.CreateAsync(remoteEP, cancellationToken);
 
-            var realClientTask = tcpClientConnectionFactory.CreateAsync(realServerEP, cancellationToken);
+            _ = agentDataClient.SendAsync(new FromDataAgentInitMessage { UserClientId = request.ClientId });
 
-            await Task.WhenAll(agentDataClientTask.AsTask(), realClientTask.AsTask());
-
-            var agentDataClient = await agentDataClientTask;
-            var realClient = await realClientTask;
-
-            await agentDataClient.SendAsync(new FromDataAgentInitMessage { UserClientId = request.ClientId });
+            var realClient = await tcpClientConnectionFactory.CreateAsync(realServerEP, cancellationToken);
 
             await exchangeConnection.ExchangeAsync(agentDataClient, realClient, cancellationToken);
 

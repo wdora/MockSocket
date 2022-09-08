@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MockSocket.Connection.Tcp;
 using MockSocket.Core.Exchange;
 using MockSocket.Core.Tcp;
@@ -20,6 +21,9 @@ namespace MockSocket.HoleClient
                 .AddTransient<IHoleClient, TcpHoleClient>()
                 .AddTransient<ITcpClientConnection, TcpClientConnection>()
                 .AddTransient<IExchangeConnection, ExchangeConnection>()
+#if DEBUG
+                .AddLogging(builder => builder.SetMinimumLevel(LogLevel.Debug))
+#endif
                 .AddTransient<TcpClientConnectionFactory>();
         }
     }

@@ -33,7 +33,7 @@ namespace MockSocket.Message.Tcp
 
             await exchangeConnection.ExchangeAsync(userClient, dataClient, cancellationToken);
 
-            cacheService.Delete(request.UserClientId);
+            cacheService.Remove(request.UserClientId);
 
             return Unit.Value;
         }

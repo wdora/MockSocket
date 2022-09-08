@@ -31,11 +31,16 @@ namespace MockSocket.HoleClient
 
             logger.LogInformation($"request app Server: {options.HoleAppServerPort}");
 
-            _ = HeartBeatAsync();
+            //_ = HeartBeatAsync();
 
+            await LoopServerMessageAsync(cancellationToken);
+        }
+
+        private async Task LoopServerMessageAsync(CancellationToken cancellationToken)
+        {
             while (true)
             {
-                var message = await client.GetMessageAsync();
+                var message = await client.GetMessageAsync(cancellationToken);
 
                 _ = mediator.Send(message, cancellationToken);
             }

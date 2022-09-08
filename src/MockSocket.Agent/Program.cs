@@ -19,7 +19,7 @@ var config = new ConfigurationBuilder()
         .Build();
 
 var sp = new ServiceCollection()
-                .AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug))
+                .AddLogging(builder => builder.AddConsole())
                 .AddHoleClient(config)
                 .BuildServiceProvider();
 

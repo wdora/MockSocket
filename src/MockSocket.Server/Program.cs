@@ -15,7 +15,7 @@ var config = new ConfigurationBuilder()
 
 var sp = new ServiceCollection()
     .AddHoleServer(config)
-    .AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug))
+    .AddLogging(builder => builder.AddConsole())
     .BuildServiceProvider();
 
 var tasks = sp.GetServices<IHoleServer>().Select(x => x.StartAsync().AsTask());

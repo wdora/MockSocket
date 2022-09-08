@@ -54,9 +54,7 @@ namespace MockSocket.HoleServer
         {
             using var client = clientConnection;
 
-            var (cts, cancellationToken) = token.CreateChildToken();
-
-            _ = client.OnClosedAsync(_ => cts.Cancel(), cancellationToken);
+            var cancellationToken = CheckConnection(client, token);
 
             while (true)
             {
@@ -64,6 +62,15 @@ namespace MockSocket.HoleServer
 
                 await mediator.Send(message, cancellationToken);
             }
+        }
+
+        private static CancellationToken CheckConnection(ITcpConnection client, CancellationToken token)
+        {
+            var (cts, cancellationToken) = token.CreateChildToken();
+
+            _ = client.OnClosedAsync(_ => cts.Cancel(), cancellationToken);
+
+            return cancellationToken;
         }
     }
 }

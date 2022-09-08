@@ -27,13 +27,18 @@ namespace MockSocket.Message.Tcp
         public async Task<Unit> Handle(FromCtrlAgentInitMessage request, CancellationToken cancellationToken)
         {
             var ctrlAgent = request.Connection;
+            try
+            {
+                await tcpServerConnection.ListenAsync(request.AppServerPort);
 
-            await tcpServerConnection.ListenAsync(request.AppServerPort);
+                logger.LogInformation($"{ctrlAgent} request to listen on {request.AppServerPort} success");
 
-            logger.LogInformation($"{ctrlAgent} request to listen on {request.AppServerPort} success");
-
-            _ = LoopAppServer(ctrlAgent, cancellationToken)
-                .ContinueWith(t => logger.LogInformation($"{request.AppServerPort} disposed"));
+                await LoopAppServer(ctrlAgent, cancellationToken);
+            }
+            finally
+            {
+                logger.LogInformation($"{ctrlAgent} disconnect and the {request.AppServerPort} disposed");
+            }
 
             return Unit.Value;
         }
@@ -48,9 +53,9 @@ namespace MockSocket.Message.Tcp
 
                 var key = userClient.ToString()!;
 
-                cacheService.Add(key, userClient);
+                _ = ctrlAgent.SendAsync(new ToCtrlAgentNewClientMessage { ClientId = key });
 
-                await ctrlAgent.SendAsync(new ToCtrlAgentNewClientMessage { ClientId = key });
+                cacheService.Add(key, userClient);
             }
         }
     }
