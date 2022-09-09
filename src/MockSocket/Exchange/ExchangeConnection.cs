@@ -29,7 +29,7 @@ namespace MockSocket.Core.Exchange
 
         public virtual async Task SwapMessageAsync(ITcpConnection send, ITcpConnection receive, CancellationToken cancellationToken = default)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(2048);
+            var buffer = ArrayPool<byte>.Shared.Rent(4096);
 
             try
             {

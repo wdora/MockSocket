@@ -11,11 +11,11 @@ namespace MockSocket.HoleClient
     public class TcpHoleClient : IHoleClient
     {
         private readonly ITcpClientConnection client;
-        private readonly HoleClientOptions options;
+        private readonly ClientOptions options;
         private readonly IMediator mediator;
         private readonly ILogger<TcpHoleClient> logger;
 
-        public TcpHoleClient(ITcpClientConnection client, IMediator mediator, ILogger<TcpHoleClient> logger, IOptions<HoleClientOptions> options)
+        public TcpHoleClient(ITcpClientConnection client, IMediator mediator, ILogger<TcpHoleClient> logger, IOptions<ClientOptions> options)
         {
             this.client = client;
             this.mediator = mediator;

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using MockSocket.Connection.Tcp;
 using MockSocket.Core.Exchange;
 using MockSocket.Core.Tcp;
+using MockSocket.Forward;
 using System.Net;
 
 namespace MockSocket.HoleClient
@@ -14,10 +15,12 @@ namespace MockSocket.HoleClient
         public static IServiceCollection AddHoleClient(this IServiceCollection services, IConfiguration configuration)
         {
             return services
-                .Configure<HoleClientOptions>(configuration)
-                .PostConfigure<HoleClientOptions>(options => options.HoleServerEP = new DnsEndPoint(options.HoleServer, options.HoleServerPort))
-                .PostConfigure<HoleClientOptions>(options => options.AgentRealServerEP = new DnsEndPoint(options.RealServer, options.RealServerPort))
+                .Configure<ClientOptions>(configuration)
+                .PostConfigure<ClientOptions>(options => options.HoleServerEP = new DnsEndPoint(options.HoleServer, options.HoleServerPort))
+                .PostConfigure<ClientOptions>(options => options.AgentRealServerEP = new DnsEndPoint(options.RealServer, options.RealServerPort))
                 .AddMediatR(typeof(ServiceCollectionExtension))
+                .AddTransient<ITcpServerConnection, TcpServerConnection>()
+                .AddTransient<IForwardServer, TcpForwardServer>()
                 .AddTransient<IHoleClient, TcpHoleClient>()
                 .AddTransient<ITcpClientConnection, TcpClientConnection>()
                 .AddTransient<IExchangeConnection, ExchangeConnection>()
@@ -28,7 +31,7 @@ namespace MockSocket.HoleClient
         }
     }
 
-    public class HoleClientOptions
+    public class ClientOptions
     {
         public string HoleServer { get; set; } = IPAddress.Loopback.ToString();
 
@@ -45,5 +48,13 @@ namespace MockSocket.HoleClient
         public EndPoint HoleServerEP { get; internal set; } = default!;
 
         public EndPoint AgentRealServerEP { get; internal set; } = default!;
+
+        public ClientType ClientType { get; set; }
+    }
+
+    public enum ClientType
+    {
+        Agent,
+        Proxy
     }
 }

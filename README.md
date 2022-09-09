@@ -4,6 +4,8 @@ MockSocket是一个免费、开源、专注于内网穿透的高性能的反向�
 
 ## 使用
 
+### 内网穿透
+
 Server
 
 `.\MockSocket.Server.exe -p 9090`
@@ -15,6 +17,12 @@ Agent
 Client
 
 `curl http://mocksocket.com:8080`
+
+### 端口转发
+
+Agent(default:agent)
+
+`.\MockSocket.Agent.exe -p 8080 -rs localhost -rsp 80 -t proxy`
 
 ## 特点
 

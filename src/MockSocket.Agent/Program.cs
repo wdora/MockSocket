@@ -3,6 +3,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MockSocket.Forward;
 using MockSocket.HoleClient;
 
 var switchMappings = new Dictionary<string, string>
@@ -12,6 +14,7 @@ var switchMappings = new Dictionary<string, string>
     { "-rsp", "RealServerPort" },
     { "-hs", "HoleServer" },
     { "-hsp", "HoleServerPort" },
+    { "-t", "ClientType" },
 };
 
 var config = new ConfigurationBuilder()
@@ -23,4 +26,9 @@ var sp = new ServiceCollection()
                 .AddHoleClient(config)
                 .BuildServiceProvider();
 
-await sp.GetService<IHoleClient>()!.ConnectAsync();
+var isAgent = sp.GetService<IOptions<ClientOptions>>()!.Value.ClientType == ClientType.Agent;
+
+if (isAgent)
+    await sp.GetService<IHoleClient>()!.ConnectAsync();
+else
+    await sp.GetService<IForwardServer>()!.StartAsync();

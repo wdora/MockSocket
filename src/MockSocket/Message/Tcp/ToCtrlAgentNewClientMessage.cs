@@ -15,10 +15,10 @@ namespace MockSocket.Message.Tcp
     public class ToCtrlAgentNewClientHandle : IRequestHandler<ToCtrlAgentNewClientMessage>
     {
         private readonly TcpClientConnectionFactory tcpClientConnectionFactory;
-        private readonly HoleClientOptions options;
+        private readonly ClientOptions options;
         private readonly IExchangeConnection exchangeConnection;
 
-        public ToCtrlAgentNewClientHandle(TcpClientConnectionFactory tcpClientConnectionFactory, IOptions<HoleClientOptions> options, IExchangeConnection exchangeConnection)
+        public ToCtrlAgentNewClientHandle(TcpClientConnectionFactory tcpClientConnectionFactory, IOptions<ClientOptions> options, IExchangeConnection exchangeConnection)
         {
             this.tcpClientConnectionFactory = tcpClientConnectionFactory;
             this.options = options.Value;
