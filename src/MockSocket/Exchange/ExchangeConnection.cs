@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using MockSocket.Cache;
 using MockSocket.Core.Tcp;
 using System.Buffers;
 using System.Net.Sockets;
@@ -10,7 +11,8 @@ namespace MockSocket.Core.Exchange
     /// </summary>
     public class ExchangeConnection : IExchangeConnection
     {
-        readonly ILogger logger;
+        private readonly ILogger logger;
+        const int bufferSize = 4096;
 
         public ExchangeConnection(ILogger<ExchangeConnection> logger)
         {
@@ -22,14 +24,17 @@ namespace MockSocket.Core.Exchange
             using var src = srcConnection;
             using var dst = dstConnection;
 
-            logger.LogDebug($"连接{srcConnection}<=>{dstConnection}开始镜像...");
+            logger.LogDebug($"Conn {srcConnection}<=>{dstConnection} start exchange...");
 
             await Task.WhenAny(SwapMessageAsync(srcConnection, dstConnection), SwapMessageAsync(dstConnection, srcConnection));
+
+            logger.LogDebug($"Conn {srcConnection}<=>{dstConnection} end exchange.");
         }
 
         public virtual async Task SwapMessageAsync(ITcpConnection send, ITcpConnection receive, CancellationToken cancellationToken = default)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(4096);
+            var buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
+            var totalSize = 0;
 
             try
             {
@@ -39,25 +44,25 @@ namespace MockSocket.Core.Exchange
                 {
                     var realSize = await receive.ReceiveAsync(memory, cancellationToken);
 
-                    if (realSize == 0 && !receive.IsConnected)
+                    if (realSize == 0)
                         return;
 
-                    await send.SendAsync(memory.Slice(0, realSize), cancellationToken);
+                    totalSize += realSize;
+
+                    var realBuffer = memory.Slice(0, realSize);
+
+                    await send.SendAsync(realBuffer, cancellationToken);
                 }
             }
-            catch (Exception e) when (e is SocketException se)
-            {
-                logger.LogDebug(se.Message, se.SocketErrorCode);
-            }
-            catch (Exception e)
+            catch (Exception e) when (e is not SocketException)
             {
                 logger.LogError(e, e.Message);
             }
             finally
             {
-                ArrayPool<byte>.Shared.Return(buffer);
+                logger.LogDebug($"{receive} received length:{totalSize}");
 
-                logger.LogDebug($"conn {receive} closed");
+                ArrayPool<byte>.Shared.Return(buffer);
             }
         }
     }

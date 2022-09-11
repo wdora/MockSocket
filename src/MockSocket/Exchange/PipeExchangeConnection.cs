@@ -14,7 +14,7 @@ namespace MockSocket.Core.Exchange
         {
         }
 
-        public override async Task SwapMessageAsync(ITcpConnection send, ITcpConnection receive, CancellationToken cancellationToken)
+        public async Task SwapMessageAsync(ITcpConnection send, ITcpConnection receive, CancellationToken cancellationToken)
         {
             var pipe = new Pipe();
 
