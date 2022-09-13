@@ -1,6 +1,7 @@
 ﻿using MockSocket.Abstractions.Serializer;
 using MockSocket.Core.Tcp;
 using System;
+using System.Buffers;
 using System.Net;
 using System.Text;
 
@@ -13,39 +14,30 @@ namespace MockSocket.Message
 
     public class MessageEncoding
     {
+        public const int BUFFER_SIZE = 1024 * 4;
         public const string TAG = ":";
 
         public readonly static Encoding Default = Encoding.UTF8;
-
         public static byte TAGByte = Default.GetBytes(TAG).First();
 
         public static string Decode(Span<byte> sourceBytes)
         {
-            var (tagIndex, length) = GetTagIndex(sourceBytes);
+            var tagIndex = GetTagIndex(sourceBytes);
+
+            var length = GetTagLength(sourceBytes.Slice(0, tagIndex));
 
             return Default.GetString(sourceBytes.Slice(tagIndex + 1, length).ToArray());
         }
 
-        public static (int index, int length) GetTagIndex(Span<byte> sourceBytes)
+        public static int GetTagIndex(Span<byte> sourceBytes)
         {
-            int index = -1, length = 0;
-
             for (int i = 0; i < sourceBytes.Length; i++)
             {
                 if (sourceBytes[i] == TAGByte)
-                {
-                    index = i;
-                    break;
-                }
+                    return i;
             }
 
-            var lengthBytes = sourceBytes.Slice(0, index).ToArray();
-
-            var lengthStr = Default.GetString(lengthBytes);
-
-            length = int.Parse(lengthStr);
-
-            return (index, length);
+            return -1;
         }
 
         public static int GetTagLength(Span<byte> sourceBytes)
@@ -57,15 +49,17 @@ namespace MockSocket.Message
             return length;
         }
 
-        public static byte[] Encode(string srcStr)
+        public static int Encode(string srcStr, Memory<byte> memory)
         {
             var str = Default.GetByteCount(srcStr) + TAG + srcStr;
 
-            return Default.GetBytes(str);
+            var len = Default.GetBytes(str, memory.Span);
+
+            return len;
         }
 
-        public static byte[] Encode<T>(T model)
-            => Encode(JsonService.Serialize(model));
+        public static int Encode<T>(T model, Memory<byte> memory)
+            => Encode(JsonService.Serialize(model), memory);
     }
 
     public class BaseMessage : IMessage

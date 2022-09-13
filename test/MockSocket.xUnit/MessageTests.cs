@@ -18,7 +18,11 @@ namespace MockSocket.xUnit
         [InlineData("1:1", "3:1:1")]
         public void Encode(string srcStr, string dstStr)
         {
-            var bytes = MessageEncoding.Encode(srcStr);
+            Memory<byte> buffer = new byte[1024];
+
+            var len = MessageEncoding.Encode(srcStr, buffer);
+
+            var bytes = buffer.Slice(0, len);
 
             bytes.ShouldBe(Encoding.UTF8.GetBytes(dstStr));
         }

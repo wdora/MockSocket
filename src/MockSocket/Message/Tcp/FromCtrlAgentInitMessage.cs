@@ -13,8 +13,8 @@ namespace MockSocket.Message.Tcp
 
     public class CtrlAgentInitHandle : IRequestHandler<FromCtrlAgentInitMessage>
     {
-        ITcpServerConnection tcpServerConnection;
-        ICacheService cacheService;
+        private readonly ITcpServerConnection tcpServerConnection;
+        private readonly ICacheService cacheService;
         private readonly ILogger<CtrlAgentInitHandle> logger;
 
         public CtrlAgentInitHandle(ITcpServerConnection tcpServerConnection, ICacheService cacheService, ILogger<CtrlAgentInitHandle> logger)
@@ -27,6 +27,7 @@ namespace MockSocket.Message.Tcp
         public async Task<Unit> Handle(FromCtrlAgentInitMessage request, CancellationToken cancellationToken)
         {
             var ctrlAgent = request.Connection;
+
             try
             {
                 await tcpServerConnection.ListenAsync(request.AppServerPort);

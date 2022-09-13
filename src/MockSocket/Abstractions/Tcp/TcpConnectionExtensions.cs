@@ -20,12 +20,12 @@ namespace MockSocket.Abstractions.Tcp
 
         public static async ValueTask<string> GetStringAsync(this ITcpConnection connection, CancellationToken cancellationToken = default)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(4096);
-
-            Memory<byte> memory = buffer;
+            var buffer = ArrayPool<byte>.Shared.Rent(MessageEncoding.BUFFER_SIZE);
 
             try
             {
+                Memory<byte> memory = buffer;
+
                 var offset = -1;
                 while (true)
                 {
@@ -43,10 +43,6 @@ namespace MockSocket.Abstractions.Tcp
 
                 return MessageEncoding.Default.GetString(memory.Span.Slice(0, length));
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 ArrayPool<byte>.Shared.Return(buffer);
@@ -55,9 +51,22 @@ namespace MockSocket.Abstractions.Tcp
 
         public static async ValueTask SendAsync<T>(this ITcpConnection connection, T model, CancellationToken cancellationToken = default)
         {
-            var buffer = MessageEncoding.Encode(model);
+            var buffer = ArrayPool<byte>.Shared.Rent(MessageEncoding.BUFFER_SIZE);
 
-            await connection.SendAsync(buffer, cancellationToken);
+            try
+            {
+                Memory<byte> memory = buffer;
+
+                var len = MessageEncoding.Encode(model, buffer);
+
+                var data = memory.Slice(0, len);
+
+                await connection.SendAsync(data, cancellationToken);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
         }
 
         public static bool IsConnected(this Socket so)
