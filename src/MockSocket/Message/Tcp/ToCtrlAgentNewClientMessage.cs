@@ -31,13 +31,13 @@ namespace MockSocket.Message.Tcp
             var remoteEP = options.HoleServerEP;
             var realServerEP = options.AgentRealServerEP;
 
-            var agentDataClient = await tcpClientConnectionFactory.CreateAsync(remoteEP, cancellationToken);
+            var agentDataClient = await tcpClientConnectionFactory.CreateAsync(remoteEP, cancellationToken).AsTask();
 
-            _ = agentDataClient.SendAsync(new FromDataAgentInitMessage { UserClientId = request.ClientId });
+            await agentDataClient.SendAsync(new FromDataAgentInitMessage { UserClientId = request.ClientId });
 
-            var realClient = await tcpClientConnectionFactory.CreateAsync(realServerEP, cancellationToken);
+            var realClient = await tcpClientConnectionFactory.CreateAsync(realServerEP, cancellationToken).AsTask();
 
-            await exchangeConnection.ExchangeAsync(agentDataClient, realClient, cancellationToken);
+            _ = exchangeConnection.ExchangeAsync(agentDataClient, realClient, cancellationToken);
 
             return Unit.Value;
         }

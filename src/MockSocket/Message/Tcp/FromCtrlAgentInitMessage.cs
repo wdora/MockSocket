@@ -53,7 +53,7 @@ namespace MockSocket.Message.Tcp
 
                 var key = userClient.ToString()!;
 
-                _ = ctrlAgent.SendAsync(new ToCtrlAgentNewClientMessage { ClientId = key });
+                await ctrlAgent.SendAsync(new ToCtrlAgentNewClientMessage { ClientId = key });
 
                 cacheService.Add(key, userClient);
             }

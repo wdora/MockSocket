@@ -42,7 +42,7 @@ namespace MockSocket.HoleClient
             {
                 var message = await client.GetMessageAsync(cancellationToken);
 
-                _ = mediator.Send(message, cancellationToken);
+                await mediator.Send(message, cancellationToken);
             }
         }
 

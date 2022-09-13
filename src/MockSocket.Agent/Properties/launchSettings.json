@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MockSocket.Agent": {
+      "commandName": "Project",
+      "commandLineArgs": "-hs wdora.com -c Release"
+    }
+  }
+}
