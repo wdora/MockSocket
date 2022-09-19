@@ -42,7 +42,9 @@ namespace MockSocket.Message.Tcp
 
         private async Task LoopAppServer(ITcpConnection ctrlAgent, int appPort, CancellationToken cancellationToken)
         {
-            logger.LogInformation($"{ctrlAgent} request to listen on {appPort} success");
+            var id = ctrlAgent.ToString();
+
+            logger.LogInformation($"{id} request to listen on {appPort} success");
 
             try
             {
@@ -61,7 +63,7 @@ namespace MockSocket.Message.Tcp
             }
             finally
             {
-                logger.LogInformation($"{ctrlAgent} disconnect and the {appPort} disposed");
+                logger.LogInformation($"{id} disconnect and the {appPort} disposed");
             }
         }
 

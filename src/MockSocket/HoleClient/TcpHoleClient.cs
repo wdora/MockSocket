@@ -29,9 +29,9 @@ namespace MockSocket.HoleClient
 
             await client.SendAsync(new CtrlAgent_HoleServer_Init_Message { AppServerPort = options.HoleAppServerPort });
 
-            logger.LogInformation($"request app Server: {options.HoleAppServerPort}");
+            logger.LogInformation($"request app Server success: {options.HoleAppServerPort}");
 
-            //_ = HeartBeatAsync();
+            _ = HeartBeatAsync(cancellationToken);
 
             await LoopServerMessageAsync(cancellationToken);
         }
@@ -46,11 +46,11 @@ namespace MockSocket.HoleClient
             }
         }
 
-        private async Task HeartBeatAsync()
+        private async Task HeartBeatAsync(CancellationToken cancellationToken)
         {
             while (true)
             {
-                await Task.Delay(options.HeartInterval);
+                await Task.Delay(options.HeartInterval, cancellationToken);
 
                 await client.SendAsync(new CtrlAgent_HoleServer_Heart_Message());
             }

@@ -25,7 +25,6 @@ namespace MockSocket.Message.Tcp
             this.exchangeConnection = exchangeConnection;
         }
 
-
         public async Task<Unit> Handle(AppServer_CtrlAgent_NewClient_Message request, CancellationToken cancellationToken)
         {
             var remoteEP = options.HoleServerEP;
@@ -33,7 +32,7 @@ namespace MockSocket.Message.Tcp
 
             var agentDataClient = await tcpClientConnectionFactory.CreateAsync(remoteEP, cancellationToken);
 
-            _ = agentDataClient.SendAsync(new DataAgent_HoleServer_Init_Message { UserClientId = request.ClientId });
+            await agentDataClient.SendAsync(new DataAgent_HoleServer_Init_Message { UserClientId = request.ClientId });
 
             var realClient = await tcpClientConnectionFactory.CreateAsync(realServerEP, cancellationToken);
 
