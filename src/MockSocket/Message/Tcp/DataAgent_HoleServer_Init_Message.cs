@@ -5,12 +5,12 @@ using MockSocket.Core.Tcp;
 
 namespace MockSocket.Message.Tcp
 {
-    public class FromDataAgentInitMessage : TcpBaseMessage, IRequest
+    public class DataAgent_HoleServer_Init_Message : TcpBaseMessage, IRequest
     {
         public string UserClientId { get; set; } = "";
     }
 
-    public class DataAgentInitHandle : IRequestHandler<FromDataAgentInitMessage>
+    public class DataAgentInitHandle : IRequestHandler<DataAgent_HoleServer_Init_Message>
     {
         ICacheService cacheService;
 
@@ -22,7 +22,7 @@ namespace MockSocket.Message.Tcp
             this.exchangeConnection = exchangeConnection;
         }
 
-        public async Task<Unit> Handle(FromDataAgentInitMessage request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(DataAgent_HoleServer_Init_Message request, CancellationToken cancellationToken)
         {
             var userClient = cacheService.Get<ITcpConnection>(request.UserClientId);
 

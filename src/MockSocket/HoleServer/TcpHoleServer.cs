@@ -41,36 +41,22 @@ namespace MockSocket.HoleServer
 
             while (true)
             {
-                var client = await server.AcceptAsync(cancellationToken);
+                var agent = await server.AcceptAsync(cancellationToken);
 
-                if (client == null)
-                    break;
-
-                _ = HandleAgentAsync(client, cancellationToken);
+                _ = HandleAgentAsync(agent, cancellationToken);
             }
         }
 
-        private async ValueTask HandleAgentAsync(ITcpConnection clientConnection, CancellationToken token)
+        private async ValueTask HandleAgentAsync(ITcpConnection agentConnection, CancellationToken cancellationToken)
         {
-            using var client = clientConnection;
-
-            var cancellationToken = CheckConnection(client, token);
+            using var agent = agentConnection;
 
             while (true)
             {
-                var message = await client.GetMessageAsync(cancellationToken);
+                var message = await agent.GetMessageAsync(cancellationToken);
 
                 await mediator.Send(message, cancellationToken);
             }
-        }
-
-        private static CancellationToken CheckConnection(ITcpConnection client, CancellationToken token)
-        {
-            var (cts, cancellationToken) = token.CreateChildToken();
-
-            _ = client.OnClosedAsync(_ => cts.Cancel(), cancellationToken);
-
-            return cancellationToken;
         }
     }
 }

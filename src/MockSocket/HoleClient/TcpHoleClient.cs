@@ -27,7 +27,7 @@ namespace MockSocket.HoleClient
         {
             await client.ConnectAsync(options.HoleServerEP);
 
-            await client.SendAsync(new FromCtrlAgentInitMessage { AppServerPort = options.HoleAppServerPort });
+            await client.SendAsync(new CtrlAgent_HoleServer_Init_Message { AppServerPort = options.HoleAppServerPort });
 
             logger.LogInformation($"request app Server: {options.HoleAppServerPort}");
 
@@ -52,7 +52,7 @@ namespace MockSocket.HoleClient
             {
                 await Task.Delay(options.HeartInterval);
 
-                await client.SendAsync(new FromCtrlAgentHeartMessage());
+                await client.SendAsync(new CtrlAgent_HoleServer_Heart_Message());
             }
         }
 
