@@ -20,6 +20,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B3CC55CB-F
 		docs\ab.md = docs\ab.md
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Benchmarks", "benchmark\MockSocket.Benchmarks\MockSocket.Benchmarks.csproj", "{C855C519-F4AE-4666-8502-4677A9748AC0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmark", "benchmark", "{C4E37B38-6CFB-4CC5-AF23-BBD56EF263BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +46,10 @@ Global
 		{CD2A7B18-625E-40B6-9A22-2EC5B8DC77A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD2A7B18-625E-40B6-9A22-2EC5B8DC77A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CD2A7B18-625E-40B6-9A22-2EC5B8DC77A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C855C519-F4AE-4666-8502-4677A9748AC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C855C519-F4AE-4666-8502-4677A9748AC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C855C519-F4AE-4666-8502-4677A9748AC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C855C519-F4AE-4666-8502-4677A9748AC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +59,7 @@ Global
 		{7C50F4B2-019B-4032-8A56-441CB220BFCB} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 		{379151D7-E0AB-4451-AE58-4FF1187E85D5} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 		{CD2A7B18-625E-40B6-9A22-2EC5B8DC77A0} = {9029273C-1B38-4070-B690-6256F4CD207C}
+		{C855C519-F4AE-4666-8502-4677A9748AC0} = {C4E37B38-6CFB-4CC5-AF23-BBD56EF263BB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {97F367FC-2651-49ED-962F-6A5BC9AA7F5C}

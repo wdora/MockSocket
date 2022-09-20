@@ -8,6 +8,7 @@ namespace MockSocket.Connection.Tcp
     public class TcpConnection : ITcpConnection, IDisposable
     {
         internal readonly Socket socket;
+        readonly Lazy<string> id;
 
         public TcpConnection()
             : this(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
@@ -17,6 +18,8 @@ namespace MockSocket.Connection.Tcp
         public TcpConnection(Socket socket)
         {
             this.socket = socket;
+
+            id = new Lazy<string>(() => $"tcp:{socket.LocalEndPoint}-{socket.RemoteEndPoint}");
 
             LingerOption lingerOption = new LingerOption(false, 0);
 
@@ -54,7 +57,7 @@ namespace MockSocket.Connection.Tcp
 
         public override string ToString()
         {
-            return $"tcp:{socket.LocalEndPoint}-{socket.RemoteEndPoint}";
+            return id.Value;
         }
     }
 

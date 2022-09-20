@@ -24,11 +24,11 @@ namespace MockSocket.Core.Exchange
             using var src = srcConnection;
             using var dst = dstConnection;
 
-            logger.LogDebug($"Conn {srcConnection}<=>{dstConnection} start exchange...");
+            logger.LogDebug("Conn {srcConnection}<=>{dstConnection} start exchange...", src, dst);
 
             await Task.WhenAny(SwapMessageAsync(srcConnection, dstConnection), SwapMessageAsync(dstConnection, srcConnection));
 
-            logger.LogDebug($"Conn {srcConnection}<=>{dstConnection} end exchange.");
+            logger.LogDebug("Conn {srcConnection}<=>{dstConnection} end exchange.", src, dst);
         }
 
         public virtual async Task SwapMessageAsync(ITcpConnection send, ITcpConnection receive, CancellationToken cancellationToken = default)
@@ -54,13 +54,14 @@ namespace MockSocket.Core.Exchange
                     await send.SendAsync(realBuffer, cancellationToken);
                 }
             }
-            catch (Exception e) when (e is not SocketException)
+            catch (SocketException) { }
+            catch (Exception e)
             {
                 logger.LogError(e, e.Message);
             }
             finally
             {
-                logger.LogDebug($"{receive} received length:{totalSize}");
+                logger.LogDebug("{receive} received length:{totalSize}", receive, totalSize);
 
                 ArrayPool<byte>.Shared.Return(buffer);
             }
