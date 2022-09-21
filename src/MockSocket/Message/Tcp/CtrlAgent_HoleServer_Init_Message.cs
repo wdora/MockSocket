@@ -35,12 +35,12 @@ namespace MockSocket.Message.Tcp
 
             var token = CheckConnection(ctrlAgent, cancellationToken);
 
-            _ = LoopAppServer(ctrlAgent, appPort, token);
+            _ = LoopAppServerAsync(ctrlAgent, appPort, token);
 
             return Unit.Value;
         }
 
-        private async Task LoopAppServer(ITcpConnection ctrlAgent, int appPort, CancellationToken cancellationToken)
+        private async Task LoopAppServerAsync(ITcpConnection ctrlAgent, int appPort, CancellationToken cancellationToken)
         {
             var id = ctrlAgent.ToString();
 
@@ -56,20 +56,24 @@ namespace MockSocket.Message.Tcp
 
                     var key = userClient.ToString()!;
 
-                    await ctrlAgent.SendAsync(new AppServer_CtrlAgent_NewClient_Message { ClientId = key });
-
                     cacheService.Add(key, userClient);
+
+                    await ctrlAgent.SendAsync(new AppServer_CtrlAgent_NewClient_Message { ClientId = key });
                 }
             }
             finally
             {
                 logger.LogInformation($"{id} disconnect and the {appPort} disposed");
+
+                cacheService.Remove(ctrlAgent.ToString()!);
             }
         }
 
-        private static CancellationToken CheckConnection(ITcpConnection client, CancellationToken token)
+        private CancellationToken CheckConnection(ITcpConnection client, CancellationToken token)
         {
             var (cts, cancellationToken) = token.CreateChildToken();
+
+            cacheService.Add(client.ToString()!, cts);
 
             _ = client.OnClosedAsync(_ => cts.Cancel(), cancellationToken);
 

@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MockSocket.Abstractions.Tcp;
 using MockSocket.Core.Exchange;
 using MockSocket.Core.Tcp;
 using MockSocket.HoleClient;
+using MockSocket.HoleServer;
 
 namespace MockSocket.Forward
 {
@@ -12,18 +14,22 @@ namespace MockSocket.Forward
         private readonly ITcpServerConnection tcpServer;
         private readonly TcpClientConnectionFactory tcpClientConnectionFactory;
         private readonly IExchangeConnection exchangeConnection;
+        private readonly ILogger<TcpForwardServer> logger;
 
-        public TcpForwardServer(IOptions<ClientOptions> options, ITcpServerConnection tcpServer, TcpClientConnectionFactory tcpClientConnectionFactory, IExchangeConnection exchangeConnection)
+        public TcpForwardServer(IOptions<ClientOptions> options, ITcpServerConnection tcpServer, TcpClientConnectionFactory tcpClientConnectionFactory, IExchangeConnection exchangeConnection, ILogger<TcpForwardServer> logger)
         {
             this.options = options.Value;
             this.tcpServer = tcpServer;
             this.tcpClientConnectionFactory = tcpClientConnectionFactory;
             this.exchangeConnection = exchangeConnection;
+            this.logger = logger;
         }
 
         public async ValueTask StartAsync(CancellationToken cancellationToken = default)
         {
             await tcpServer.ListenAsync(options.HoleAppServerPort);
+
+            logger.LogInformation($"Proxy start forward: {options.HoleAppServerPort}");
 
             while (true)
             {
