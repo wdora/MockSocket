@@ -37,7 +37,7 @@ namespace MockSocket.Abstractions.Tcp
                         break;
                 }
 
-                var length = MessageEncoding.GetTagLength(memory.Span.Slice(0, offset));
+                var length = MessageEncoding.FastGetTagLength(memory.Span.Slice(0, offset));
 
                 await connection.ReceiveAsync(memory.Slice(0, length), cancellationToken);
 

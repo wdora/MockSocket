@@ -6,63 +6,12 @@ using System.Buffers;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace MockSocket.Message
 {
     public interface IMessage
     {
         string MessageType { get; }
-    }
-
-    public class MessageEncoding
-    {
-        public const int BUFFER_SIZE = 1024 * 4;
-        public const string TAG = ":";
-
-        public readonly static Encoding Default = Encoding.UTF8;
-        public static byte TAGByte = Default.GetBytes(TAG).First();
-
-        public static string Decode(Span<byte> sourceBytes)
-        {
-            var tagIndex = GetTagIndex(sourceBytes);
-
-            var length = GetTagLength(sourceBytes.Slice(0, tagIndex));
-
-            return Default.GetString(sourceBytes.Slice(tagIndex + 1, length).ToArray());
-        }
-
-        public static int GetTagIndex(Span<byte> sourceBytes)
-        {
-            for (int i = 0; i < sourceBytes.Length; i++)
-            {
-                if (sourceBytes[i] == TAGByte)
-                    return i;
-            }
-
-            return -1;
-        }
-
-        public static int GetTagLength(Span<byte> sourceBytes)
-        {
-            var lengthStr = Default.GetString(sourceBytes);
-
-            var length = int.Parse(lengthStr);
-
-            return length;
-        }
-
-        public static int Encode(string srcStr, Memory<byte> memory)
-        {
-            var str = Default.GetByteCount(srcStr) + TAG + srcStr;
-
-            var len = Default.GetBytes(str, memory.Span);
-
-            return len;
-        }
-
-        public static int Encode<T>(T model, Memory<byte> memory)
-            => Encode(JsonService.Serialize(model), memory);
     }
 
     public class BaseMessage : IMessage
