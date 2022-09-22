@@ -77,15 +77,16 @@ namespace MockSocket.Abstractions.Tcp
             }
             catch (Exception)
             {
-                // System.ObjectDisposedException: Cannot access a disposed object
+                // 如：System.ObjectDisposedException: Cannot access a disposed object
                 return false;
             }
         }
 
         public static async Task OnClosedAsync(this ITcpConnection connection, Action<ITcpConnection> connectionClosed, CancellationToken cancellationToken)
         {
-            while (connection.IsConnected && !cancellationToken.IsCancellationRequested)
-                await Task.Delay(1);
+            // connection.IsConnected 存在瞬态false情况
+            while ((connection.IsConnected ? true : connection.IsConnected) && !cancellationToken.IsCancellationRequested)
+                await Task.Delay(1000);
 
             connectionClosed(connection);
         }

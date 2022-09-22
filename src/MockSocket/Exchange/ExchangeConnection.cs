@@ -54,10 +54,8 @@ namespace MockSocket.Core.Exchange
                     await send.SendAsync(realBuffer, cancellationToken);
                 }
             }
-            catch (SocketException) { }
-            catch (Exception e)
+            catch (Exception)
             {
-                logger.LogError(e, e.Message);
             }
             finally
             {
