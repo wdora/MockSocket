@@ -75,8 +75,9 @@ namespace MockSocket.Abstractions.Tcp
             {
                 return !(so.Poll(1, SelectMode.SelectRead) && so.Available == 0);
             }
-            catch (SocketException)
+            catch (Exception)
             {
+                // System.ObjectDisposedException: Cannot access a disposed object
                 return false;
             }
         }
