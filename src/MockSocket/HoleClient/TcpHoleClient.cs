@@ -29,7 +29,7 @@ namespace MockSocket.HoleClient
 
             await client.SendAsync(new CtrlAgent_HoleServer_Init_Message { AppServerPort = options.HoleAppServerPort });
 
-            logger.LogInformation($"request app Server success: {options.HoleAppServerPort}");
+            logger.LogInformation($"request Server {options.HoleServerEP} to listen AppServer: {options.HoleAppServerPort}");
 
             _ = HeartBeatAsync(cancellationToken);
 
