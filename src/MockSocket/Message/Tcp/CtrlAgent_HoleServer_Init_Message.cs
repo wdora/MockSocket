@@ -64,8 +64,6 @@ namespace MockSocket.Message.Tcp
             finally
             {
                 logger.LogInformation($"{id} disconnect and the {appPort} disposed");
-
-                cacheService.Remove(ctrlAgent.ToString()!);
             }
         }
 
@@ -73,9 +71,7 @@ namespace MockSocket.Message.Tcp
         {
             var (cts, cancellationToken) = token.CreateChildToken();
 
-            cacheService.Add(client.ToString()!, cts);
-
-            _ = client.OnClosedAsync(_ => cts.Cancel(), cancellationToken);
+            _ = client.OnClosedAsync(cts);
 
             return cancellationToken;
         }

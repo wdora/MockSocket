@@ -4,6 +4,7 @@ using System.Buffers;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 
 namespace MockSocket.Abstractions.Tcp
 {
@@ -82,7 +83,7 @@ namespace MockSocket.Abstractions.Tcp
             }
         }
 
-        public static async Task OnClosedAsync(this ITcpConnection connection, Action<ITcpConnection> connectionClosed, CancellationToken cancellationToken)
+        static async Task OnClosedAsync(this ITcpConnection connection, Action<ITcpConnection> connectionClosed, CancellationToken cancellationToken)
         {
             // connection.IsConnected 存在瞬态false情况
             while ((connection.IsConnected ? true : connection.IsConnected) && !cancellationToken.IsCancellationRequested)
@@ -90,5 +91,12 @@ namespace MockSocket.Abstractions.Tcp
 
             connectionClosed(connection);
         }
+
+        public static Task OnClosedAsync(this ITcpConnection connection, CancellationTokenSource cancellationTokenSource)
+            => OnClosedAsync(connection, _ =>
+                {
+                    cancellationTokenSource.Cancel();
+                    cancellationTokenSource.Dispose();
+                }, cancellationTokenSource.Token);
     }
 }
