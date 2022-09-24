@@ -1,0 +1,1 @@
+docker build -t wdora/mocksocket-server:0.0.1 .

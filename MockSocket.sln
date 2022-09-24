@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{B3CC55CB-F
 	ProjectSection(SolutionItems) = preProject
 		docs\ab.md = docs\ab.md
 		docs\benchmark.md = docs\benchmark.md
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Benchmarks", "benchmark\MockSocket.Benchmarks\MockSocket.Benchmarks.csproj", "{C855C519-F4AE-4666-8502-4677A9748AC0}"
