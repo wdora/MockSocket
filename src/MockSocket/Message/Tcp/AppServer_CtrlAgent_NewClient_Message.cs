@@ -25,20 +25,27 @@ namespace MockSocket.Message.Tcp
             this.exchangeConnection = exchangeConnection;
         }
 
-        public async Task<Unit> Handle(AppServer_CtrlAgent_NewClient_Message request, CancellationToken cancellationToken)
+        public Task<Unit> Handle(AppServer_CtrlAgent_NewClient_Message request, CancellationToken cancellationToken)
+        {
+            _ = SwapAsync(request, cancellationToken);
+
+            return Task.FromResult(Unit.Value);
+        }
+
+        private async Task SwapAsync(AppServer_CtrlAgent_NewClient_Message request, CancellationToken cancellationToken)
         {
             var remoteEP = options.HoleServerEP;
             var realServerEP = options.AgentRealServerEP;
 
             var agentDataClient = await tcpClientConnectionFactory.CreateAsync(remoteEP, cancellationToken);
+            
+            var realClientTask = tcpClientConnectionFactory.CreateAsync(realServerEP, cancellationToken);
 
             await agentDataClient.SendAsync(new DataAgent_HoleServer_Init_Message { UserClientId = request.ClientId });
 
-            var realClient = await tcpClientConnectionFactory.CreateAsync(realServerEP, cancellationToken);
+            var realClient = await realClientTask;
 
-            _ = exchangeConnection.ExchangeAsync(agentDataClient, realClient, cancellationToken);
-
-            return Unit.Value;
+            await exchangeConnection.ExchangeAsync(agentDataClient, realClient, cancellationToken);
         }
     }
 }

@@ -40,9 +40,12 @@ namespace MockSocket.Abstractions.Tcp
 
                 var length = MessageEncoding.FastGetTagLength(memory.Span.Slice(0, offset));
 
-                await connection.ReceiveAsync(memory.Slice(0, length), cancellationToken);
+                var count = await connection.ReceiveAsync(memory.Slice(0, length), cancellationToken);
 
-                return MessageEncoding.Default.GetString(memory.Span.Slice(0, length));
+                while (count < length)
+                    count += await connection.ReceiveAsync(memory.Slice(count, length - count), cancellationToken);
+
+                return MessageEncoding.Default.GetString(memory.Slice(0, length).Span);
             }
             finally
             {
