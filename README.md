@@ -31,15 +31,7 @@ MockSocket是一个免费、开源、专注于内网穿透的高性能的反向�
 
 Server
 
-`docker run wdora/mocksocket-server:0.0.1 -p 9090:9090`
-
-配合iptables启用(8080-50000)端口转发
-
-`iptables -t nat -A DOCKER -p tcp --dport 8080:50000 -j DNAT --to-destination 172.17.0.7`(172.17.0.7 为 container IP)
-
-清理iptables
-
-`iptables -t nat -D DOCKER -p tcp --dport 8080:50000 -j DNAT --to-destination 172.17.0.7`
+`docker run -d --name mocksocket-server --network host wdora/mocksocket-server:0.0.1`
 
 ### Cli版(支持 Windows、Linux、Mac)
 
@@ -62,3 +54,17 @@ Client
 Agent(default:agent)
 
 `.\MockSocket.Agent.exe -p 8080 -rs localhost -rsp 80 -t proxy`
+
+## tips
+
+如果希望对端口设限制，可通过 docker + iptables 配合：
+
+`docker run wdora/mocksocket-server:0.0.1 -p 9090:9090`
+
+启用iptables(8080-50000)端口转发：
+
+`iptables -t nat -A DOCKER -p tcp --dport 8080:50000 -j DNAT --to-destination 172.17.0.7`(172.17.0.7 为 container IP)
+
+清理iptables：
+
+`iptables -t nat -D DOCKER -p tcp --dport 8080:50000 -j DNAT --to-destination 172.17.0.7`
