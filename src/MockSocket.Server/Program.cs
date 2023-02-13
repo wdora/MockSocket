@@ -18,8 +18,6 @@ var sp = new ServiceCollection()
     .AddLogging(builder => builder.AddConsole())
     .BuildServiceProvider();
 
-var tasks = sp.GetServices<IHoleServer>().Select(x => x.StartAsync().AsTask());
-
-await Task.WhenAll(tasks);
+await sp.GetService<IHoleServer>()!.StartAsync();
 
 Console.ReadLine();

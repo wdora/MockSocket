@@ -31,6 +31,11 @@ namespace MockSocket.HoleServer
 
         public void Dispose() => server?.Dispose();
 
+        public ValueTask StartAsync()
+        {
+            return default;
+        }
+
         public async ValueTask StartAsync(CancellationToken cancellationToken = default)
         {
             var ep = new IPEndPoint(IPAddress.Any, option.ListenPort);

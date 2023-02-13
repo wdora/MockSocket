@@ -43,4 +43,23 @@ namespace MockSocket.Connection.Udp
             socket.Dispose();
         }
     }
+
+    public class UdpClientConnection : IUdpConnection
+    {
+        Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+
+        public void Dispose() => socket?.Dispose();
+
+        public ValueTask<SocketReceiveFromResult> ReceiveAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            EndPoint clientSo = new IPEndPoint(IPAddress.Any, 0);
+
+            return socket.ReceiveFromAsync(buffer, SocketFlags.None, clientSo);
+        }
+
+        public ValueTask<int> SendAsync(EndPoint remoteEP, Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            return socket.SendToAsync(buffer, SocketFlags.None, remoteEP);
+        }
+    }
 }

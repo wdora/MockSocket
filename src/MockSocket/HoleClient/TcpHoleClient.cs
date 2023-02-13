@@ -25,15 +25,18 @@ namespace MockSocket.HoleClient
 
         public async ValueTask ConnectAsync(CancellationToken cancellationToken = default)
         {
-            await client.ConnectAsync(options.HoleServerEP);
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await client.ConnectAsync(options.HoleServerEP);
 
-            await client.SendAsync(new CtrlAgent_HoleServer_Init_Message { AppServerPort = options.HoleAppServerPort });
+                await client.SendAsync(new CtrlAgent_HoleServer_Init_Message { AppServerPort = options.HoleAppServerPort });
 
-            logger.LogInformation($"request Server {options.HoleServerEP} to listen AppServer: {options.HoleAppServerPort}");
+                logger.LogInformation($"request Server {options.HoleServerEP} to listen AppServer: {options.HoleAppServerPort}");
 
-            _ = HeartBeatAsync(cancellationToken);
+                _ = HeartBeatAsync(cancellationToken);
 
-            await LoopServerMessageAsync(cancellationToken);
+                await LoopServerMessageAsync(cancellationToken);
+            }
         }
 
         private async Task LoopServerMessageAsync(CancellationToken cancellationToken)

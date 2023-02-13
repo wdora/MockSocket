@@ -1,4 +1,5 @@
 ﻿using MockSocket.Abstractions.Serializer;
+using MockSocket.Abstractions.Udp;
 using MockSocket.Core.Tcp;
 using MockSocket.Message.Tcp;
 using System;
@@ -69,5 +70,7 @@ namespace MockSocket.Message
     public class UdpBaseMessage : BaseMessage
     {
         public IPEndPoint AgentEP { get; set; }
+
+        public IUdpConnection Connection { get; set; }
     }
 }

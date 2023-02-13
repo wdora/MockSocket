@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using MockSocket.Message;
+using System.Buffers;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -8,11 +10,22 @@ namespace MockSocket.Abstractions.Udp
     {
         public static async ValueTask SendAsync<T>(this IUdpConnection connection, EndPoint remoteEP, T model, CancellationToken cancellationToken = default)
         {
-            var data = JsonSerializer.Serialize(model);
+            var buffer = ArrayPool<byte>.Shared.Rent(MessageEncoding.BUFFER_SIZE);
 
-            var bytes = Encoding.UTF8.GetBytes(data);
+            try
+            {
+                Memory<byte> memory = buffer;
 
-            await connection.SendAsync(remoteEP, bytes, cancellationToken);
+                var len = MessageEncoding.Encode(model, buffer);
+
+                var data = memory.Slice(0, len);
+
+                await connection.SendAsync(remoteEP, data, cancellationToken);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
         }
     }
 }

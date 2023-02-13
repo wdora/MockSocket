@@ -1,34 +1,23 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MockSocket.Forward;
-using MockSocket.HoleClient;
+using MockSocket.Agent;
+using Topshelf;
 
-var switchMappings = new Dictionary<string, string>
+var rc = HostFactory.Run(x =>                                   //1
 {
-    { "-p", "HoleAppServerPort" },
-    { "-rs", "RealServer" },
-    { "-rsp", "RealServerPort" },
-    { "-hs", "HoleServer" },
-    { "-hsp", "HoleServerPort" },
-    { "-t", "ClientType" },
-};
+    x.Service<HoleClientService>(s =>                                   //2
+    {
+        s.ConstructUsing(name => new HoleClientService());                //3
+        s.WhenStarted(tc => tc.Start(args));                         //4
+        s.WhenStopped(tc => tc.Stop());                          //5
+    });
 
-var config = new ConfigurationBuilder()
-        .AddCommandLine(args, switchMappings)
-        .Build();
+    x.RunAsLocalSystem();                                       //6
 
-var sp = new ServiceCollection()
-                .AddLogging(builder => builder.AddConsole())
-                .AddHoleClient(config)
-                .BuildServiceProvider();
+    x.SetDescription("MockSocket Agent");                   //7
+    x.SetDisplayName("MockSocket Agent");                                  //8
+    x.SetServiceName("MockSocket Agent");                                  //9
+});                                                             //10
 
-var isAgent = sp.GetService<IOptions<ClientOptions>>()!.Value.ClientType == ClientType.Agent;
-
-if (isAgent)
-    await sp.GetService<IHoleClient>()!.ConnectAsync();
-else
-    await sp.GetService<IForwardServer>()!.StartAsync();
+var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());  //11
+Environment.ExitCode = exitCode;
