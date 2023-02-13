@@ -82,7 +82,7 @@ namespace MockSocket.Message
         public static int Encode<T>(T model, Memory<byte> memory)
             => FastEncode(JsonService.Serialize(model), memory);
 
-        public static T Decode<T>(T model, ReadOnlySpan<byte> span)
+        public static T Decode<T>(ReadOnlySpan<byte> span)
             => JsonService.Deserialize<T>(FastDecode(span));
     }
 }

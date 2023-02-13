@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using MockSocket.Agent;
+using System.Net;
 using Topshelf;
 
 var rc = HostFactory.Run(x =>                                   //1
