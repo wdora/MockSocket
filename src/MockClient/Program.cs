@@ -4,23 +4,45 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+var epStr = args.LastOrDefault();
 
-var ep = IPEndPoint.Parse(args.FirstOrDefault() ?? "0.0.0.0:10000");
-
-socket.Bind(ep);
-
-socket.Listen(10);
-
-Console.WriteLine($"Listening on {ep}");
-
-while (true)
+if (string.IsNullOrWhiteSpace(epStr))
 {
-    var client = await socket.AcceptAsync();
+    Console.WriteLine("You must specify a host to connect to");
+    return;
+}
 
-    Console.WriteLine($"Connect from {client.RemoteEndPoint}");
+var ep = IPEndPoint.Parse(epStr);
 
-    _ = LoopClient(client);
+if (IsServerMode(args))
+{
+    await StartServerAsync(ep);
+    return;
+}
+
+bool IsServerMode(string[] args)
+{
+    return args.Any(x => x.Contains('l'));
+}
+
+await StartClientAsync(remoteEP: ep);
+
+async Task StartClientAsync(EndPoint remoteEP)
+{
+    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+    await socket.ConnectAsync(remoteEP);
+
+    var buffer = new byte[1024].AsMemory();
+
+    while (true)
+    {
+        var message = Console.ReadLine();
+
+        var count = Encoding.UTF8.GetBytes(message, buffer.Span);
+
+        await socket.SendAsync(buffer.Slice(0, count));
+    }
 }
 
 static async Task LoopClient(Socket client)
@@ -42,14 +64,33 @@ static async Task LoopClient(Socket client)
             }
 
             Console.Write(Encoding.UTF8.GetString(memory.Slice(0, dataLen).Span));
-
-            Console.Out.Flush();
         }
         catch (Exception)
         {
             Console.WriteLine($"Abort from {client.RemoteEndPoint}");
+            break;
         }
     }
 
     ArrayPool<byte>.Shared.Return(bytes);
+}
+
+static async Task StartServerAsync(EndPoint ep)
+{
+    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+    socket.Bind(ep);
+
+    socket.Listen(10);
+
+    Console.WriteLine($"Listening on {ep}");
+
+    while (true)
+    {
+        var client = await socket.AcceptAsync();
+
+        Console.WriteLine($"Connect from {client.RemoteEndPoint}");
+
+        _ = LoopClient(client);
+    }
 }
