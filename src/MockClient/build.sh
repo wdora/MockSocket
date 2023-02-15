@@ -1,1 +1,1 @@
-docker run --network host -d --name mockclient wdora/mockclient:0.1
+docker build -f Dockerfile -t wdora/mockclient:0.1 .
