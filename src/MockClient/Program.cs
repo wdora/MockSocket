@@ -18,7 +18,7 @@ while (true)
 {
     var client = await socket.AcceptAsync();
 
-    Console.WriteLine($"Connection from {client.RemoteEndPoint}");
+    Console.WriteLine($"Connect from {client.RemoteEndPoint}");
 
     _ = LoopClient(client);
 }
@@ -37,7 +37,7 @@ static async Task LoopClient(Socket client)
 
             if (dataLen == 0)
             {
-                Console.WriteLine($"DisConnection from {client.RemoteEndPoint}");
+                Console.WriteLine($"Disconnect from {client.RemoteEndPoint}");
                 break;
             }
 
