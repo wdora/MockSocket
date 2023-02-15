@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Benchmarks", "be
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmark", "benchmark", "{C4E37B38-6CFB-4CC5-AF23-BBD56EF263BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockClient", "src\MockClient\MockClient.csproj", "{BA379BB7-BF95-4F6D-9274-E8B1B6F6E00C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{C855C519-F4AE-4666-8502-4677A9748AC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C855C519-F4AE-4666-8502-4677A9748AC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C855C519-F4AE-4666-8502-4677A9748AC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA379BB7-BF95-4F6D-9274-E8B1B6F6E00C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA379BB7-BF95-4F6D-9274-E8B1B6F6E00C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA379BB7-BF95-4F6D-9274-E8B1B6F6E00C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA379BB7-BF95-4F6D-9274-E8B1B6F6E00C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -62,6 +68,7 @@ Global
 		{379151D7-E0AB-4451-AE58-4FF1187E85D5} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 		{CD2A7B18-625E-40B6-9A22-2EC5B8DC77A0} = {9029273C-1B38-4070-B690-6256F4CD207C}
 		{C855C519-F4AE-4666-8502-4677A9748AC0} = {C4E37B38-6CFB-4CC5-AF23-BBD56EF263BB}
+		{BA379BB7-BF95-4F6D-9274-E8B1B6F6E00C} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {97F367FC-2651-49ED-962F-6A5BC9AA7F5C}
