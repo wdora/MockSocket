@@ -10,7 +10,7 @@ WORKDIR /src
 # COPY "MockClient.csproj" "MockClient.csproj"
 
 COPY . .
-RUN dotnet publish --no-restore -c Release -o /app
+RUN dotnet publish -c Release -o /app
 
 FROM build AS publish
 

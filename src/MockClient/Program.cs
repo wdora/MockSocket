@@ -42,6 +42,8 @@ static async Task LoopClient(Socket client)
             }
 
             Console.Write(Encoding.UTF8.GetString(memory.Slice(0, dataLen).Span));
+
+            Console.Out.Flush();
         }
         catch (Exception)
         {
