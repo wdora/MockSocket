@@ -1,3 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-
-await new MockFactory().StartAsync(args);
+public interface IStartup
+{
+    ValueTask StartAsync();
+}
