@@ -1,22 +1,18 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MockSocket.Forward;
 using MockSocket.HoleClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MockSocket.Agent
 {
     public class HoleClientService
     {
-        CancellationTokenSource ctx = new CancellationTokenSource();
+        CancellationTokenSource cts = new CancellationTokenSource();
 
-        public async Task Start(string[] args)
+        public void Start(string[] args) => StartAsync(args).Wait();
+
+        public async Task StartAsync(string[] args)
         {
             var switchMappings = new Dictionary<string, string>
             {
@@ -32,23 +28,21 @@ namespace MockSocket.Agent
                     .AddCommandLine(args, switchMappings)
                     .Build();
 
+            Host.CreateDefaultBuilder(args)
+                .Build()
+                .Start();
+
             var sp = new ServiceCollection()
                             .AddLogging(builder => builder.AddConsole())
                             .AddHoleClient(config)
                             .BuildServiceProvider();
 
-            var isAgent = sp.GetService<IOptions<ClientOptions>>()!.Value.ClientType == ClientType.Agent;
-
-            if (isAgent)
-                await sp.GetService<IHoleClient>()!.ConnectAsync(ctx.Token);
-            else
-                await sp.GetService<IForwardServer>()!.StartAsync();
-
+            await sp.GetService<IMockAgent>()!.StartAsync(cts.Token);
         }
 
         public void Stop()
         {
-            ctx.Cancel();
+            cts.Cancel();
         }
     }
 }

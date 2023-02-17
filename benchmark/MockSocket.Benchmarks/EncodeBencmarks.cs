@@ -11,7 +11,7 @@ public class EncodeBencmarks
 
     string data = Guid.NewGuid().ToString();
 
-    IEncoder encoder = new FastEncoder();
+    IEncoder encoder = new JsonEncoder();
 
     [Benchmark(Baseline = true)]
     public void EncodeAndDecode()
@@ -30,8 +30,7 @@ public class EncodeBencmarks
     [Benchmark]
     public void Encoder_Decoder()
     {
-        var span = buffer2.Span;
-        encoder.Encode(data, span);
-        encoder.Decode<string>(span);
+        var len = encoder.Encode(data, buffer2);
+        encoder.Decode<string>(buffer2, len);
     }
 }

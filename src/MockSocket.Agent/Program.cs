@@ -1,24 +1,29 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using MockSocket.Agent;
-using System.Net;
+using Microsoft.Extensions.Hosting;
 using Topshelf;
 
-var rc = HostFactory.Run(x =>                                   //1
+
+HostFactory.Run(x =>
 {
-    x.Service<HoleClientService>(s =>                                   //2
+    x.Service<IHost>(s =>
     {
-        s.ConstructUsing(name => new HoleClientService());                //3
-        s.WhenStarted(tc => tc.Start(args));                         //4
-        s.WhenStopped(tc => tc.Stop());                          //5
+        s.ConstructUsing(a => CreateHost());
+        s.WhenStarted(tc => tc.Start());
+        s.WhenStopped(tc => tc.StopAsync().Wait());
     });
 
-    x.RunAsLocalSystem();                                       //6
+    x.RunAsLocalSystem();
 
-    x.SetDescription("MockSocket Agent");                   //7
-    x.SetDisplayName("MockSocket Agent");                                  //8
-    x.SetServiceName("MockSocket Agent");                                  //9
-});                                                             //10
+    x.SetDescription("MockSocket Agent is Powered by .NET 7.0");
+    x.SetDisplayName("MockSocket Agent");
+    x.SetServiceName("MockSocket Agent");
+});
 
-var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());  //11
-Environment.ExitCode = exitCode;
+IHost CreateHost()
+{
+    return Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(args).Build();
+}
+
+//var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());
+//Environment.ExitCode = exitCode;

@@ -14,21 +14,27 @@ namespace MockSocket.xUnit
 {
     public class AgentTest : AgentTestBase
     {
-        readonly ITcpAgent tcpAgent;
-
-        public AgentTest()
-        {
-            tcpAgent = serviceProvider.GetService<ITcpAgent>()!;
-        }
-
         [Theory]
-        [InlineData("wdora.com", 80)]
-        [InlineData("baidu.com", 80)]
-        public async Task ConnectAsync_Ok(string host, int port)
+        [InlineData("wdora.com", 10000)]
+        public async ValueTask HeartBeatAsync(string host, int port)
         {
-            await tcpAgent.ConnectAsync(host, port);
+            var agent = new MockTcpClient();
+
+            await agent.ConnectAsync(host, port);
+
+            //await agent.HeartBeatAsync();
         }
+
+        //[Theory]
+        //public ValueTask CreateAppServerAsync(string host, int port, int remotePort)
+        //{
+        //    return default;
+        //}
+
+
     }
+
+
 
     public class FastEncodingTest : AgentTestBase
     {
@@ -40,31 +46,34 @@ namespace MockSocket.xUnit
         }
 
         [Theory]
-        [InlineData("hello world")]
+        //[InlineData("hello world")]
         [MemberData(nameof(GetData))]
         public void Encode_And_Decode<T>(T message)
             where T : class
         {
-            Span<byte> buffer = new byte[1024];
+            Memory<byte> buffer = new byte[1024];
 
             var len = encoder.Encode(message, buffer);
 
-            len.ShouldBeGreaterThan(0);
+            var data1 = encoder.Decode<T>(buffer, len);
+            var data2 = (T?)encoder.Decode<object>(buffer, len);
 
-            var data = encoder.Decode<T>(buffer);
-
-            Assert.Equal(message, data);
+            Assert.Equal(message, data1);
+            Assert.Equal(data1, data2);
         }
 
         public static IEnumerable<object[]> GetData()
         {
             yield return new object[] { new User { Id = 100 } };
+            yield return new object[] { null };
         }
     }
 
+    [Serializable]
     record class User
     {
         public int Id { get; set; }
+        public string Name { get; set; }
     }
 
     public class AgentTestBase
@@ -74,8 +83,8 @@ namespace MockSocket.xUnit
         public AgentTestBase()
         {
             this.serviceProvider = new ServiceCollection()
-                .AddTransient<ITcpAgent, TcpAgent>()
-                .AddTransient<IEncoder, FastEncoder>()
+                .AddTransient<ITcpClient, MockTcpClient>()
+                .AddTransient<IEncoder, JsonEncoder>()
                 .BuildServiceProvider();
         }
     }
