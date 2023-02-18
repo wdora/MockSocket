@@ -263,6 +263,8 @@ namespace MockSocket.Agent
                 logger.LogError(e, "连接断开");
 
                 cancellationTokenSource.Cancel();
+
+                throw;
             }
         }
     }

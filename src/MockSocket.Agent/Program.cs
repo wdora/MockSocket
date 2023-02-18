@@ -2,7 +2,7 @@
 
 using Topshelf;
 
-HostFactory.Run(x =>
+var rc = HostFactory.Run(x =>
 {
     x.Service<MockHost>(s =>
     {
@@ -11,11 +11,11 @@ HostFactory.Run(x =>
         s.WhenStopped(h => h.Stop());
     });
 
-    x.RunAsLocalSystem();
+    x.StartAutomatically().RunAsLocalSystem();
 
     x.SetDescription("MockSocket Agent is Powered by .NET 7.0");
     x.SetDisplayName("MockSocket Agent");
-    x.SetServiceName("MockSocket Agent");
+    x.SetServiceName("MockSocket");
 });
 
 //var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());
