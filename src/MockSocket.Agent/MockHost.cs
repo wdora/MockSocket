@@ -17,9 +17,16 @@ class MockHost
 
                 Log.Logger = new LoggerConfiguration()
                     .WriteTo.File("log-.txt", rollingInterval: RollingInterval.Day)
+                    .WriteTo.Console()
                     .CreateLogger();
 
                 services.Configure<MockAgentConfig>(config.GetSection("mocksocket"));
+
+                services
+                    .AddHostedService<MockHostService>()
+                    .AddSingleton<IMockAgent, MockAgent>()
+                    .AddSingleton<IPairService, PairService>();
+
             })
             .UseSerilog()
             .Build();

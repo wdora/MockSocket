@@ -26,7 +26,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Benchmarks", "be
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmark", "benchmark", "{C4E37B38-6CFB-4CC5-AF23-BBD56EF263BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockClient", "src\MockClient\MockClient.csproj", "{BA379BB7-BF95-4F6D-9274-E8B1B6F6E00C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockClient", "src\MockClient\MockClient.csproj", "{BA379BB7-BF95-4F6D-9274-E8B1B6F6E00C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{79CED911-80E2-4936-ABF9-955615589E9F}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

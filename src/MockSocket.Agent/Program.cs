@@ -13,9 +13,9 @@ var rc = HostFactory.Run(x =>
 
     x.StartAutomatically().RunAsLocalSystem();
 
-    x.SetDescription("MockSocket Agent is Powered by .NET 7.0");
-    x.SetDisplayName("MockSocket Agent");
     x.SetServiceName("MockSocket");
+    x.SetDisplayName("MockSocket Agent");
+    x.SetDescription("MockSocket Agent is Powered by .NET 7.0");
 });
 
 //var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());

@@ -1,17 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog.Core;
 using System.Buffers;
 using System.Net.Sockets;
 using System.Text;
 
 namespace MockSocket.Agent
 {
-    public interface ITcpConnection
-    {
-        ValueTask SendAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default);
-
-        ValueTask<int> ReceiveAsync(Memory<byte> data, CancellationToken cancellationToken = default);
-    }
 
     public interface ITcpClient : ITcpConnection, IDisposable
     {
@@ -58,13 +53,13 @@ namespace MockSocket.Agent
 
         public ValueTask SendAsync<T>(T model, CancellationToken cancellationToken = default)
         {
-            return BufferPool.Instance.Run(buffer =>
+            return BufferPool.Instance.Run(async buffer =>
             {
                 var dataLen = JsonEncoder.Instance.Encode(model, buffer.Slice(HEADCOUNT));
 
                 var totalLen = Encode<T>(buffer, dataLen);
 
-                return SendAsync(buffer.Slice(0, totalLen), cancellationToken);
+                await SendAsync(data: buffer.Slice(0, totalLen), cancellationToken);
             });
         }
 
@@ -81,7 +76,7 @@ namespace MockSocket.Agent
 
             buffer.Span[HEADCOUNT - 1] = typeNameLength;
 
-            return dataLen + typeNameLength;
+            return dataLen + typeNameLength + HEADCOUNT;
         }
 
         public ValueTask<T> ReceiveAsync<T>(CancellationToken cancellationToken = default)
@@ -120,7 +115,7 @@ namespace MockSocket.Agent
         {
             var typeNameRaw = Encoding.UTF8.GetString(buffer.Slice(dataLen, typeNameLength).Span);
 
-            return (Type.GetType(typeNameRaw), buffer.Slice(0, dataLen));
+            return (Type.GetType(typeNameRaw)!, buffer.Slice(0, dataLen));
         }
     }
 
@@ -135,7 +130,7 @@ namespace MockSocket.Agent
         private readonly ILogger<MockAgent> logger;
         private readonly IPairService pairService;
 
-        private MockTcpClient agent;
+        private MockTcpClient agent = null!;
 
         public MockAgent(IOptions<MockAgentConfig> config, ILogger<MockAgent> logger, IPairService pairService)
         {
@@ -163,17 +158,17 @@ namespace MockSocket.Agent
                 {
                     if (!checkExp(e))
                         throw;
+
+                    var delay = TimeSpan.FromSeconds(config.RetryInterval);
+
+                    logger.LogError(e, $"连接故障，{delay} 后重新连接");
+
+                    await Task.Delay(delay);
                 }
-
-                var delay = TimeSpan.FromSeconds(config.RetryInterval);
-
-                logger.LogError($"连接故障，{delay} 后重新连接");
-
-                await Task.Delay(delay);
             }
         }
 
-        public async ValueTask StartCoreAsync(CancellationToken cancellationToken)
+        private async ValueTask StartCoreAsync(CancellationToken cancellationToken)
         {
             var (host, port) = config.RemoteServer;
 
@@ -237,7 +232,8 @@ namespace MockSocket.Agent
 
             await agent.SendAsync(new CreateAppServerCmd(appServer.Port, appServer.Protocal));
 
-            var isOk = await agent.ReceiveAsync<bool>();
+            var isOk = await agent.ReceiveAsync<bool>()
+                        .TimeoutAsync(() => false, maxTimeSeconds: 3);
 
             if (!isOk)
                 throw new AppServerException($"无法监听: {config.AppServer}");
@@ -269,6 +265,17 @@ namespace MockSocket.Agent
         }
     }
 
+    public static class TaskExtension
+    {
+        public static async ValueTask<T> TimeoutAsync<T>(this ValueTask<T> actual, Func<T> degrade, int maxTimeSeconds)
+        {
+            var delay = Task.Delay(TimeSpan.FromSeconds(maxTimeSeconds))
+                    .ContinueWith(t => degrade());
+
+            return await await Task.WhenAny(actual.AsTask(), delay);
+        }
+    }
+
     public interface IPairService
     {
         ValueTask PairAsync(MockTcpClient realClient, MockTcpClient dataClient, CancellationToken cancellationToken);
@@ -276,9 +283,32 @@ namespace MockSocket.Agent
 
     public class PairService : IPairService
     {
-        public ValueTask PairAsync(MockTcpClient realClient, MockTcpClient dataClient, CancellationToken cancellationToken)
+        readonly ILogger logger;
+
+        public PairService(ILogger<PairService> logger)
         {
-            throw new NotImplementedException();
+            this.logger = logger;
+        }
+
+        public async ValueTask PairAsync(MockTcpClient client1, MockTcpClient client2, CancellationToken cancellationToken)
+        {
+            var task1 = ForwardAsync(client1, client2, cancellationToken);
+
+            var task2 = ForwardAsync(client2, client1, cancellationToken);
+
+            await Task.WhenAny(task1, task2);
+
+            logger.LogDebug("交换连接断开");
+        }
+
+        static Task ForwardAsync(MockTcpClient send, MockTcpClient receive, CancellationToken cancellationToken)
+        {
+            return BufferPool.Instance.Run(async memory =>
+            {
+                var realSize = await send.ReceiveAsync(memory);
+
+                await receive.SendAsync(memory[..realSize], cancellationToken);
+            }).AsTask();
         }
     }
 
