@@ -1,4 +1,4 @@
-﻿namespace MockSocket.Agent
+﻿namespace MockSocket.Core.Tcp
 {
     public interface ITcpConnection
     {

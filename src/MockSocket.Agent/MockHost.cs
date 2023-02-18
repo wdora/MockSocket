@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MockSocket.Agent;
-using Serilog;
+using MockSocket.Core.Extensions;
+using NLog.Extensions.Logging;
 
 class MockHost
 {
@@ -15,20 +16,15 @@ class MockHost
             {
                 var config = hostContext.Configuration;
 
-                Log.Logger = new LoggerConfiguration()
-                    .WriteTo.File("log-.txt", rollingInterval: RollingInterval.Day)
-                    .WriteTo.Console()
-                    .CreateLogger();
-
-                services.Configure<MockAgentConfig>(config.GetSection("mocksocket"));
-
                 services
                     .AddHostedService<MockHostService>()
-                    .AddSingleton<IMockAgent, MockAgent>()
-                    .AddSingleton<IPairService, PairService>();
+                    .AddAgent(config.GetSection("MockSocket"))
+                    .AddSingleton<IMockAgent, MockAgent>();
 
+                services.AddLogging(builder => builder.AddNLog());
+
+                NLog.LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
             })
-            .UseSerilog()
             .Build();
     }
 

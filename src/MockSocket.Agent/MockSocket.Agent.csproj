@@ -13,14 +13,12 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-		<PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
-		<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
-		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+		<PackageReference Include="NLog.Extensions.Logging" Version="5.2.2" />
 		<PackageReference Include="Topshelf" Version="4.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\MockSocket\MockSocket.csproj" />
+		<ProjectReference Include="..\MockSocket.Core\MockSocket.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
