@@ -156,20 +156,20 @@ namespace MockSocket.Agent
                 try
                 {
                     await startCoreAsync(cancellationToken);
+
+                    return;
                 }
                 catch (Exception e)
                 {
                     if (!checkExp(e))
                         throw;
                 }
-                finally
-                {
-                    var delay = TimeSpan.FromSeconds(config.RetryInterval);
 
-                    logger.LogError($"连接故障，{delay} 后重新连接");
+                var delay = TimeSpan.FromSeconds(config.RetryInterval);
 
-                    await Task.Delay(delay);
-                }
+                logger.LogError($"连接故障，{delay} 后重新连接");
+
+                await Task.Delay(delay);
             }
         }
 
