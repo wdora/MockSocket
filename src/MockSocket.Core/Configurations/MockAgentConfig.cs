@@ -6,7 +6,7 @@
 
         public ServerEndpoint RealServer { get; set; } = new("localhost", 80);
 
-        public AppServer AppServer { get; set; } = new(8080, "tcp");
+        public AppServer AppServer { get; set; } = new(3390, "tcp");
 
         public int HeartInterval { get; set; } = 30;
 

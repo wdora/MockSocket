@@ -48,7 +48,7 @@ namespace MockSocket.Core.Tcp
         {
             return BufferPool.Instance.Run(async buffer =>
             {
-                var len = await ReceiveAsync(buffer.Slice(0, HEADCOUNT), cancellationToken);
+                var len = await ReceiveAsync(data: buffer.Slice(0, HEADCOUNT), cancellationToken);
 
                 if (len != HEADCOUNT)
                     throw new ArgumentOutOfRangeException(nameof(len), len, $"len != HEADCOUNT: {new { len, HEADCOUNT }}");
@@ -58,14 +58,14 @@ namespace MockSocket.Core.Tcp
                 if (totalLength > buffer.Length)
                     throw new ArgumentOutOfRangeException(nameof(totalLength), totalLength, $"dataLen > buffer.Length: {new { totalLength, buffer.Length }}");
 
-                len = await ReceiveAsync(buffer.Slice(0, totalLength), cancellationToken);
+                len = await ReceiveAsync(data: buffer.Slice(0, totalLength), cancellationToken);
 
                 if (len != totalLength)
                     throw new ArgumentOutOfRangeException(nameof(len), len, $"len != dataLen: {new { len, totalLength }}");
 
                 (var type, buffer) = Decode(buffer, dataLen, typeNameLength);
 
-                return (T)JsonEncodeService.Instance.Decode(buffer, totalLength, type)!;
+                return (T)JsonEncodeService.Instance.Decode(buffer, dataLen, type)!;
             });
         }
 

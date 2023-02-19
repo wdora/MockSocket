@@ -9,9 +9,8 @@ namespace MockSocket.Core.Extensions
     {
         public static IServiceCollection AddAgent(this IServiceCollection services, IConfigurationSection config)
         {
-            services.Configure<MockAgentConfig>(config);
-
             return services
+                .Configure<MockAgentConfig>(config)
                 .AddSingleton<IPairService, PairService>()
                 .AddSingleton<IEncodeService, JsonEncodeService>();
         }

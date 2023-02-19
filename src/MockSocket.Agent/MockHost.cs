@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MockSocket.Agent;
@@ -13,6 +14,9 @@ class MockHost
     {
         host = Host
             .CreateDefaultBuilder(args)
+#if DEBUG
+            .ConfigureHostConfiguration(config => config.AddInMemoryCollection(new Dictionary<string, string?> { { HostDefaults.EnvironmentKey, Environments.Development } }))
+#endif
             .ConfigureServices((hostContext, services) =>
             {
                 var config = hostContext.Configuration;

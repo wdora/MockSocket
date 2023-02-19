@@ -126,6 +126,8 @@ namespace MockSocket.Agent
 
             if (!isOk)
                 throw new AppServerException($"无法监听: {config.AppServer}");
+
+            logger.LogDebug("创建应用服务成功");
         }
 
         private async Task HeartBeatAsync(CancellationTokenSource cancellationTokenSource)

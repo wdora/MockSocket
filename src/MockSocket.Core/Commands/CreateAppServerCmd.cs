@@ -1,4 +1,4 @@
 ﻿namespace MockSocket.Core.Commands
 {
-    public record class CreateAppServerCmd(int port, string type) : ICmd;
+    public record class CreateAppServerCmd(int Port, string Type) : ICmd;
 }

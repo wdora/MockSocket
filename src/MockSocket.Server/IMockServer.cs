@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MockSocket.Core.Commands;
 using MockSocket.Core.Configurations;
@@ -23,39 +24,44 @@ namespace MockSocket.Server
 
         IMediator mediator;
 
-        public MockServer(IOptions<MockServerConfig> config, IMockTcpServer server, IMediator mediator)
+        ILogger logger;
+
+        public MockServer(IOptions<MockServerConfig> config, IMockTcpServer server, IMediator mediator, ILogger<MockServer> logger)
         {
             this.config = config.Value;
             this.server = server;
             this.mediator = mediator;
+            this.logger = logger;
         }
 
         public async ValueTask StartAsync(CancellationToken cancellationToken = default)
         {
             await server.ListenAsync(config.ListenPort);
 
+            logger.LogInformation("服务监听成功:{0}", server.ToString());
+
             while (true)
             {
                 var agent = await server.AcceptAsync(cancellationToken);
 
-                _ = HandleAgent(agent, cancellationToken);
+                await HandleAgentAsync(agent, cancellationToken);
             }
         }
 
 
-        private async Task HandleAgent(MockTcpClient agent, CancellationToken cancellationToken)
+        private async Task HandleAgentAsync(MockTcpClient agent, CancellationToken cancellationToken)
         {
             using var client = CurrentContext.Agent = agent;
 
             var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            _ = client.Register(cts.Cancel);
+            //_ = client.Register(cts.Cancel);
 
             while (true)
             {
                 var command = await client.ReceiveAsync<ICmd>(cts.Token);
 
-                await mediator.Send(command, cts.Token);
+                await mediator.Send(command as object, cts.Token);
             }
         }
     }
@@ -109,7 +115,9 @@ namespace MockSocket.Server
 
         public async Task Handle(CreateAppServerCmd request, CancellationToken cancellationToken)
         {
-            await server.ListenAsync(request.port);
+            await server.ListenAsync(request.Port);
+
+            await CurrentContext.Agent.SendAsync(true);
 
             while (true)
             {
@@ -140,6 +148,11 @@ namespace MockSocket.Server
             _socket.Listen();
 
             return default;
+        }
+
+        public override string ToString()
+        {
+            return _socket.LocalEndPoint?.ToString() ?? "";
         }
     }
 
