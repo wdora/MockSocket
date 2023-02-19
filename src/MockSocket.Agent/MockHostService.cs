@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using MockSocket.Agent;
 
 public class MockHostService : IHostedService

@@ -1,6 +1,8 @@
-﻿namespace MockSocket.Core.Commands
+﻿using MediatR;
+
+namespace MockSocket.Core.Commands
 {
-    public interface ICmd
+    public interface ICmd : IRequest
     {
     }
 }

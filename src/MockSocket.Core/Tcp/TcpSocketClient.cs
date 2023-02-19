@@ -4,7 +4,7 @@ namespace MockSocket.Core.Tcp
 {
     public abstract class TcpSocketClient : ITcpClient
     {
-        readonly Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        protected Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         public ValueTask DisconnectAsync()
         {

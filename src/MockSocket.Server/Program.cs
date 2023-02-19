@@ -1,23 +1,23 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Microsoft.Extensions.Configuration;
+
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using MockSocket.HoleServer;
+using Microsoft.Extensions.Hosting;
+using MockSocket.Server;
+using System.Reflection;
 
-var switchMappings = new Dictionary<string, string>
-{
-    { "-p", "ListenPort" }
-};
+var host = Host
+    .CreateDefaultBuilder(args)
+    .ConfigureServices(services =>
+    {
+        services
+            .AddMemoryCache()
+            .AddSingleton<IMockServer, MockServer>()
+            .AddTransient<IMockTcpServer, MockTcpServer>()
+            .AddHostedService<MockHostService>()
+            .AddMediatR(cfg => 
+                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly())
+                );
+    })
+    .Build();
 
-var config = new ConfigurationBuilder()
-        .AddCommandLine(args, switchMappings)
-        .Build();
-
-var sp = new ServiceCollection()
-    .AddHoleServer(config)
-    .AddLogging(builder => builder.AddConsole())
-    .BuildServiceProvider();
-
-await sp.GetService<IHoleServer>()!.StartAsync();
-
-Console.ReadLine();
+await host.StartAsync();

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net.Sockets;
+using System.Text;
 using MockSocket.Core.Services;
 
 namespace MockSocket.Core.Tcp
@@ -6,6 +7,14 @@ namespace MockSocket.Core.Tcp
     public class MockTcpClient : TcpSocketClient
     {
         private const int HEADCOUNT = 5;
+
+        public MockTcpClient()
+        {
+        }
+
+        public MockTcpClient(Socket client) => _socket = client;
+
+        public string Id => $"{_socket.LocalEndPoint}-{_socket.RemoteEndPoint}";
 
         public ValueTask SendAsync<T>(T model, CancellationToken cancellationToken = default)
         {
@@ -72,6 +81,22 @@ namespace MockSocket.Core.Tcp
             var typeNameRaw = Encoding.UTF8.GetString(buffer.Slice(dataLen, typeNameLength).Span);
 
             return (Type.GetType(typeNameRaw)!, buffer.Slice(0, dataLen));
+        }
+
+        public async ValueTask Register(Action callback)
+        {
+            while (true)
+            {
+                var isConnect = !(_socket.Poll(1, SelectMode.SelectRead) && _socket.Available == 0);
+
+                if (!isConnect)
+                {
+                    callback();
+                    break;
+                }
+
+                await Task.Delay(500);
+            }
         }
     }
 }
