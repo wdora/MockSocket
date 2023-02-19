@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MockSocket.Agent;
 using MockSocket.Core.Extensions;
 using NLog.Extensions.Logging;
@@ -19,11 +20,14 @@ class MockHost
                 services
                     .AddHostedService<MockHostService>()
                     .AddAgent(config.GetSection("MockSocket"))
-                    .AddSingleton<IMockAgent, MockAgent>();
-
-                services.AddLogging(builder => builder.AddNLog());
-
-                NLog.LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
+                    .AddSingleton<IMockAgent, MockAgent>()
+                    .AddLogging(builder =>
+                    {
+                        builder.ClearProviders();
+                        
+                        builder.AddNLog();
+                        NLog.LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
+                    });
             })
             .Build();
     }
