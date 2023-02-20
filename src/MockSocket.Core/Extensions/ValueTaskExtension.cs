@@ -2,7 +2,7 @@
 {
     public static class ValueTaskExtension
     {
-        public static async ValueTask<T> TimeoutAsync<T>(this ValueTask<T> actual, Func<T> degrade, int maxTimeSeconds)
+        public static async ValueTask<T> TimeoutAsync<T>(this ValueTask<T> actual, Func<T> degrade, int maxTimeSeconds = 3)
         {
             var delay = Task.Delay(TimeSpan.FromSeconds(maxTimeSeconds))
                     .ContinueWith(t => degrade());
@@ -17,7 +17,25 @@
             {
                 return degrade();
             }
+        }
 
+        public static async ValueTask RetryAsync(this ValueTask valueTask, int retryIntervalSeconds = 3, CancellationToken cancellationToken = default)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await valueTask;
+
+                    return;
+                }
+                catch (Exception)
+                {
+                    var delay = TimeSpan.FromSeconds(retryIntervalSeconds);
+
+                    await Task.Delay(delay);
+                }
+            }
         }
     }
 }

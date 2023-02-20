@@ -30,7 +30,16 @@ namespace MockSocket.Core.Tcp
 
         public void Dispose()
         {
-            _socket?.Dispose();
+            try
+            {
+                // https://github.com/dotnet/runtime/issues/26957
+                // Disposing socket on Linux does not interrupt poll/select
+                _socket.Shutdown(SocketShutdown.Both);
+            }
+            finally
+            {
+                _socket?.Dispose();
+            }
         }
     }
 }

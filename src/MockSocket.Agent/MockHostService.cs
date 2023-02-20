@@ -21,23 +21,15 @@ public class MockHostService : IHostedService
         this.agent = agent;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        try
-        {
-            await agent.StartAsync(cancellationToken);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        _ = agent.StartAsync(cancellationToken);
 
-        Console.WriteLine("dsads");
+        return Task.CompletedTask;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        return Task.CompletedTask;
+        await agent.StopAsync();
     }
 }

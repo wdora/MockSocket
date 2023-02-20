@@ -88,7 +88,7 @@ namespace MockSocket.Core.Tcp
             while (true)
             {
                 var isConnect = !(_socket.Poll(1, SelectMode.SelectRead) && _socket.Available == 0);
-
+                
                 if (!isConnect)
                 {
                     Console.WriteLine("主动检测到连接断开");

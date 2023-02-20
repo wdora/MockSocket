@@ -3,5 +3,7 @@
     public interface IMockAgent
     {
         ValueTask StartAsync(CancellationToken cancellationToken = default);
+
+        ValueTask StopAsync();
     }
 }

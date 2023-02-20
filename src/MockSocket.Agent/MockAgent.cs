@@ -6,6 +6,7 @@ using MockSocket.Core.Exceptions;
 using MockSocket.Core.Extensions;
 using MockSocket.Core.Services;
 using MockSocket.Core.Tcp;
+using System.Threading;
 
 namespace MockSocket.Agent
 {
@@ -16,6 +17,7 @@ namespace MockSocket.Agent
         private readonly IPairService pairService;
 
         private MockTcpClient agent = null!;
+        private CancellationTokenSource cts;
 
         public MockAgent(IOptions<MockAgentConfig> config, ILogger<MockAgent> logger, IPairService pairService)
         {
@@ -26,34 +28,12 @@ namespace MockSocket.Agent
 
         public ValueTask StartAsync(CancellationToken cancellationToken = default)
         {
-            return Retry(StartCoreAsync, ex => ex is not AppServerException, cancellationToken);
+            cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            return StartCoreAsync(cts.Token).RetryAsync(cancellationToken: cts.Token);
         }
 
-        private async ValueTask Retry(Func<CancellationToken, ValueTask> startCoreAsync, Func<Exception, bool> checkExp, CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    await startCoreAsync(cancellationToken);
-
-                    return;
-                }
-                catch (Exception e)
-                {
-                    if (!checkExp(e?.InnerException ?? e!))
-                        throw;
-
-                    var delay = TimeSpan.FromSeconds(config.RetryInterval);
-
-                    logger.LogError(e, $"连接故障，{delay} 后重新连接");
-
-                    await Task.Delay(delay);
-                }
-            }
-        }
-
-        private async ValueTask StartCoreAsync(CancellationToken cancellationToken)
+        public async ValueTask StartCoreAsync(CancellationToken cancellationToken)
         {
             var (host, port) = config.RemoteServer;
 
@@ -124,7 +104,7 @@ namespace MockSocket.Agent
             await agent.SendAsync(new CreateAppServerCmd(appServer.Port, appServer.Protocal));
 
             var isOk = await agent.ReceiveAsync<bool>()
-                        .TimeoutAsync(() => false, maxTimeSeconds: 3);
+                        .TimeoutAsync(() => false);
 
             if (!isOk)
                 throw new AppServerException($"无法监听: {config.AppServer}");
@@ -161,6 +141,18 @@ namespace MockSocket.Agent
 
                 throw;
             }
+        }
+
+        public ValueTask StopAsync()
+        {
+            logger.LogInformation("停止服务");
+
+            cts.Cancel();
+
+            agent?.Dispose();
+
+            logger.LogInformation("停止服务成功");
+            return default;
         }
     }
 }
