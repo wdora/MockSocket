@@ -7,7 +7,17 @@
             var delay = Task.Delay(TimeSpan.FromSeconds(maxTimeSeconds))
                     .ContinueWith(t => degrade());
 
-            return await await Task.WhenAny(actual.AsTask(), delay);
+            try
+            {
+                var response = await await Task.WhenAny(actual.AsTask(), delay);
+
+                return response;
+            }
+            catch (Exception)
+            {
+                return degrade();
+            }
+
         }
     }
 }

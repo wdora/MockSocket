@@ -91,6 +91,7 @@ namespace MockSocket.Core.Tcp
 
                 if (!isConnect)
                 {
+                    Console.WriteLine("主动检测到连接断开");
                     callback();
                     break;
                 }

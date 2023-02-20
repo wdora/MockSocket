@@ -41,7 +41,7 @@ namespace MockSocket.Agent
                 }
                 catch (Exception e)
                 {
-                    if (!checkExp(e))
+                    if (!checkExp(e?.InnerException ?? e!))
                         throw;
 
                     var delay = TimeSpan.FromSeconds(config.RetryInterval);

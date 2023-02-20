@@ -23,7 +23,17 @@ public class MockHostService : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await agent.StartAsync(cancellationToken);
+        try
+        {
+            await agent.StartAsync(cancellationToken);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+
+        Console.WriteLine("dsads");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

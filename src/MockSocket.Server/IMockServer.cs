@@ -38,31 +38,28 @@ namespace MockSocket.Server
         {
             await server.ListenAsync(config.ListenPort);
 
-            logger.LogInformation("服务监听成功:{0}", server.ToString());
-
             while (true)
             {
                 var agent = await server.AcceptAsync(cancellationToken);
 
-                await HandleAgentAsync(agent, cancellationToken);
+                _ = HandleAgentAsync(agent, cancellationToken);
             }
         }
 
 
         private async Task HandleAgentAsync(MockTcpClient agent, CancellationToken cancellationToken)
         {
+            logger.LogInformation($"agent {agent.Id} 到达");
+
             using var client = CurrentContext.Agent = agent;
 
             var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
-            //_ = client.Register(cts.Cancel);
+            _ = client.Register(cts.Cancel);
 
-            while (true)
-            {
-                var command = await client.ReceiveAsync<ICmd>(cts.Token);
+            var command = await client.ReceiveAsync<ICmd>(cts.Token);
 
-                await mediator.Send(command as object, cts.Token);
-            }
+            await mediator.Send(command as object, cts.Token);
         }
     }
 
@@ -94,7 +91,7 @@ namespace MockSocket.Server
         {
             if (!cacheService.TryGetValue<MockTcpClient>(request.UserClientId, out var userClient))
                 return;
-            
+
             cacheService.Remove(request.UserClientId);
 
             await pairService.PairAsync(userClient!, CurrentContext.Agent, cancellationToken);
@@ -107,21 +104,26 @@ namespace MockSocket.Server
 
         IMemoryCache cacheService;
 
-        public AppServerHandle(IMockTcpServer server, IMemoryCache cacheService)
+        ILogger logger;
+
+        public AppServerHandle(IMockTcpServer server, IMemoryCache cacheService, ILogger<AppServerHandle> logger)
         {
             this.server = server;
             this.cacheService = cacheService;
+            this.logger = logger;
         }
 
         public async Task Handle(CreateAppServerCmd request, CancellationToken cancellationToken)
         {
-            await server.ListenAsync(request.Port);
+            using var appServer = server;
+
+            await appServer.ListenAsync(request.Port);
 
             await CurrentContext.Agent.SendAsync(true);
 
             while (true)
             {
-                var userClient = await server.AcceptAsync(cancellationToken);
+                var userClient = await appServer.AcceptAsync(cancellationToken);
 
                 await CurrentContext.Agent.SendAsync(userClient.Id);
 
@@ -134,6 +136,13 @@ namespace MockSocket.Server
     {
         protected readonly Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
+        ILogger logger;
+
+        public MockTcpServer(ILogger<MockTcpServer> logger)
+        {
+            this.logger = logger;
+        }
+
         public async ValueTask<MockTcpClient> AcceptAsync(CancellationToken cancellationToken)
         {
             var client = await _socket.AcceptAsync(cancellationToken);
@@ -141,11 +150,21 @@ namespace MockSocket.Server
             return new MockTcpClient(client);
         }
 
+        public void Dispose()
+        {
+            // this's endpoint couldn't visit after dispose 
+            logger.LogInformation("服务停止监听:" + this);
+
+            _socket.Dispose();
+        }
+
         public ValueTask ListenAsync(int listenPort)
         {
             _socket.Bind(new IPEndPoint(IPAddress.Any, listenPort));
 
             _socket.Listen();
+
+            logger.LogInformation("服务开始监听:" + this);
 
             return default;
         }
@@ -156,7 +175,7 @@ namespace MockSocket.Server
         }
     }
 
-    public interface IMockTcpServer
+    public interface IMockTcpServer : IDisposable
     {
         ValueTask<MockTcpClient> AcceptAsync(CancellationToken cancellationToken);
 

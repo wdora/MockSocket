@@ -14,7 +14,7 @@ namespace MockSocket.Core.Services
 
         public async ValueTask PairAsync(MockTcpClient client1, MockTcpClient client2, CancellationToken cancellationToken)
         {
-            logger.LogDebug("开始交换连接");
+            logger.LogDebug($"交换连接开始：{client1.Id} <=> {client2.Id}");
 
             try
             {
@@ -26,7 +26,7 @@ namespace MockSocket.Core.Services
             }
             finally
             {
-                logger.LogDebug("交换连接结束");
+                logger.LogDebug($"交换连接结束：{client1.Id} <=> {client2.Id}");
             }
         }
 
@@ -38,7 +38,10 @@ namespace MockSocket.Core.Services
                 {
                     var realSize = await send.ReceiveAsync(memory, cancellationToken);
 
-                    await receive.SendAsync(memory[..realSize], cancellationToken);
+                    if (realSize == 0)
+                        return;
+
+                    await receive.SendAsync(data: memory[..realSize], cancellationToken);
                 }
             }).AsTask();
         }
