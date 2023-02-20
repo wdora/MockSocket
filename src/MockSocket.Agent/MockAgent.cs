@@ -57,10 +57,10 @@ namespace MockSocket.Agent
         {
             var (host, port) = config.RemoteServer;
 
-            logger.LogDebug("正在连接服务器:" + config.RemoteServer);
+            logger.LogDebug($"正在连接服务器 {config.RemoteServer} ...");
 
             agent = await TcpSocketFactory.Create(host, port);
-            
+
             logger.LogDebug("连接服务器成功");
 
             using var client = agent;
@@ -82,6 +82,8 @@ namespace MockSocket.Agent
             {
                 var userClientId = await agent.ReceiveAsync<string>();
 
+                logger.LogInformation($"userClient {userClientId} is coming");
+
                 try
                 {
                     var realClient = await CreateRealClientAsync();
@@ -92,7 +94,7 @@ namespace MockSocket.Agent
                 }
                 catch (Exception e)
                 {
-                    logger.LogError("服务请求失败", e);
+                    logger.LogError($"userClient {userClientId} handle error", e);
                 }
             }
         }
@@ -127,7 +129,11 @@ namespace MockSocket.Agent
             if (!isOk)
                 throw new AppServerException($"无法监听: {config.AppServer}");
 
-            logger.LogDebug("创建应用服务成功");
+            var appServerEP = $"{config.AppServer.Protocal}://{config.RemoteServer.Host}:{config.AppServer.Port}";
+
+            var realServerEP = $"{config.RealServer}";
+
+            logger.LogDebug("创建服务成功，远程服务:{0},本地服务:{1}", appServerEP, realServerEP);
         }
 
         private async Task HeartBeatAsync(CancellationTokenSource cancellationTokenSource)
@@ -142,12 +148,14 @@ namespace MockSocket.Agent
                 {
                     await agent.SendAsync((DateTime.Now, config.HeartInterval), cancellationToken);
 
+                    logger.LogDebug("心跳成功");
+
                     await Task.Delay(heartInterval, cancellationToken);
                 }
             }
             catch (Exception e)
             {
-                logger.LogError(e, "连接断开");
+                logger.LogError(e, "心跳失败");
 
                 cancellationTokenSource.Cancel();
 
