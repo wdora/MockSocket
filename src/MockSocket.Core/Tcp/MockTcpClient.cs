@@ -85,19 +85,25 @@ namespace MockSocket.Core.Tcp
 
         public async ValueTask Register(Action callback)
         {
-            while (true)
+            try
             {
-                bool part1 = _socket.Poll(1000, SelectMode.SelectRead);
-                bool part2 = (_socket.Available == 0);
-                if (part1 && part2)
+                while (true)
                 {
-                    Console.WriteLine("主动检测到连接断开");
-                    callback();
-                    return;
-                }
+                    bool part1 = _socket.Poll(1000, SelectMode.SelectRead);
+                    bool part2 = _socket.Available == 0;
+                    if (part1 && part2)
+                    {
+                        Console.WriteLine("主动检测到连接断开");
+                        return;
+                    }
 
-                Console.WriteLine("主动检测" + new { part1, part2 });
-                await Task.Delay(1000);
+                    Console.WriteLine("主动检测" + new { part1, part2 });
+                    await Task.Delay(1000);
+                }
+            }
+            finally
+            {
+                callback();
             }
         }
     }
