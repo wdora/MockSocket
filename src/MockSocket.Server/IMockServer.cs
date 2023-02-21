@@ -126,17 +126,17 @@ namespace MockSocket.Server
 
         public async Task Handle(CreateAppServerCmd request, CancellationToken cancellationToken)
         {
-            using var appServer = server;
-
-            await appServer.ListenAsync(request.Port);
+            await server.ListenAsync(request.Port);
 
             await CurrentContext.Agent.SendAsync(true);
 
-            _ = LoopAsync(appServer, cancellationToken);
+            _ = LoopAsync(server, cancellationToken);
         }
 
-        private async Task LoopAsync(IMockTcpServer appServer, CancellationToken cancellationToken)
+        private async Task LoopAsync(IMockTcpServer server, CancellationToken cancellationToken)
         {
+            using var appServer = server;
+
             while (true)
             {
                 var userClient = await appServer.AcceptAsync(cancellationToken);
