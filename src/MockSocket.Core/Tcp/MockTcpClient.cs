@@ -87,16 +87,17 @@ namespace MockSocket.Core.Tcp
         {
             while (true)
             {
-                var isConnect = !(_socket.Poll(1, SelectMode.SelectRead) && _socket.Available == 0);
-                
-                if (!isConnect)
+                bool part1 = _socket.Poll(1000, SelectMode.SelectRead);
+                bool part2 = (_socket.Available == 0);
+                if (part1 && part2)
                 {
                     Console.WriteLine("主动检测到连接断开");
                     callback();
-                    break;
+                    return;
                 }
 
-                await Task.Delay(500);
+                Console.WriteLine("主动检测" + new { part1, part2 });
+                await Task.Delay(1000);
             }
         }
     }

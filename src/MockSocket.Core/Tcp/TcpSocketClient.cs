@@ -36,9 +36,10 @@ namespace MockSocket.Core.Tcp
                 // Disposing socket on Linux does not interrupt poll/select
                 _socket.Shutdown(SocketShutdown.Both);
             }
+            catch (Exception) { }
             finally
             {
-                _socket?.Dispose();
+                _socket.Dispose();
             }
         }
     }

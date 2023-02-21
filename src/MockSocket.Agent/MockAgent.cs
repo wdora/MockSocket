@@ -138,7 +138,7 @@ namespace MockSocket.Agent
 
                 cancellationTokenSource.Cancel();
 
-                return;
+                throw;
             }
         }
 
