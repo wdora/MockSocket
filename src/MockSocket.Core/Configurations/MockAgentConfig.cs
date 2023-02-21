@@ -2,7 +2,7 @@
 {
     public class MockAgentConfig
     {
-        public ServerEndpoint RemoteServer { get; set; } = new("wdora.com", 12312);
+        public ServerEndpoint RemoteServer { get; set; } = new("wdora.com", 9090);
 
         public ServerEndpoint RealServer { get; set; } = new("localhost", 3389);
 

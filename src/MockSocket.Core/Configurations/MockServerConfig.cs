@@ -2,6 +2,6 @@
 {
     public class MockServerConfig
     {
-        public int ListenPort { get; set; } = 12312;
+        public int ListenPort { get; set; } = 9090;
     }
 }

@@ -6,7 +6,6 @@ using MockSocket.Core.Exceptions;
 using MockSocket.Core.Extensions;
 using MockSocket.Core.Services;
 using MockSocket.Core.Tcp;
-using System.Threading;
 
 namespace MockSocket.Agent
 {
@@ -120,13 +119,13 @@ namespace MockSocket.Agent
         {
             var cancellationToken = cancellationTokenSource.Token;
 
+            var heartInterval = TimeSpan.FromSeconds(config.HeartInterval);
+
             try
             {
-                var heartInterval = TimeSpan.FromSeconds(config.HeartInterval);
-
                 while (true)
                 {
-                    await agent.SendAsync((DateTime.Now, config.HeartInterval), cancellationToken);
+                    await agent.SendAsync(new HeartBeatCmd(new { DateTime.Now, heartInterval }.ToString()!), cancellationToken);
 
                     logger.LogDebug("心跳成功");
 
@@ -139,7 +138,7 @@ namespace MockSocket.Agent
 
                 cancellationTokenSource.Cancel();
 
-                throw;
+                return;
             }
         }
 

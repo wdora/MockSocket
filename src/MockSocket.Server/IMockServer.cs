@@ -49,17 +49,20 @@ namespace MockSocket.Server
 
         private async Task HandleAgentAsync(MockTcpClient agent, CancellationToken cancellationToken)
         {
-            logger.LogInformation($"agent {agent.Id} 到达");
-
             using var client = CurrentContext.Agent = agent;
 
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             _ = client.Register(cts.Cancel);
 
-            var command = await client.ReceiveAsync<ICmd>(cts.Token);
+            while (true)
+            {
+                var command = await client.ReceiveAsync<ICmd>(cts.Token);
 
-            await mediator.Send(command as object, cts.Token);
+                logger.LogDebug($"{client.Id}: {command}");
+
+                await mediator.Send(command as object, cts.Token);
+            }
         }
     }
 
@@ -72,6 +75,14 @@ namespace MockSocket.Server
             get => LocalAgent.Value!;
 
             set => LocalAgent.Value = value;
+        }
+    }
+
+    public class HeartBeatHandle : IRequestHandler<HeartBeatCmd>
+    {
+        public Task Handle(HeartBeatCmd request, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 
@@ -121,9 +132,16 @@ namespace MockSocket.Server
 
             await CurrentContext.Agent.SendAsync(true);
 
+            _ = LoopAsync(appServer, cancellationToken);
+        }
+
+        private async Task LoopAsync(IMockTcpServer appServer, CancellationToken cancellationToken)
+        {
             while (true)
             {
                 var userClient = await appServer.AcceptAsync(cancellationToken);
+
+                logger.LogInformation($"userClient {userClient.Id} is coming");
 
                 await CurrentContext.Agent.SendAsync(userClient.Id);
 
@@ -137,6 +155,7 @@ namespace MockSocket.Server
         protected readonly Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
         ILogger logger;
+        IPEndPoint localEP = null!;
 
         public MockTcpServer(ILogger<MockTcpServer> logger)
         {
@@ -160,7 +179,9 @@ namespace MockSocket.Server
 
         public ValueTask ListenAsync(int listenPort)
         {
-            _socket.Bind(new IPEndPoint(IPAddress.Any, listenPort));
+            localEP = new IPEndPoint(IPAddress.Any, listenPort);
+
+            _socket.Bind(localEP);
 
             _socket.Listen();
 
@@ -169,9 +190,10 @@ namespace MockSocket.Server
             return default;
         }
 
+
         public override string ToString()
         {
-            return _socket.LocalEndPoint?.ToString() ?? "";
+            return localEP?.ToString() ?? "";
         }
     }
 
