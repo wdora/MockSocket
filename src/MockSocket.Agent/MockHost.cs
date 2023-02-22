@@ -12,7 +12,6 @@ class MockHost
 
     public MockHost(string[] args)
     {
-        // for host config
         SetEnv();
 
         host = Host
@@ -39,6 +38,8 @@ class MockHost
     [Conditional("DEBUG")]
     private void SetEnv()
     {
+        // for host config：from "DOTNET_" prefixed environment variables
+        // for app config：from environment variables
         Environment.SetEnvironmentVariable("DOTNET_" + HostDefaults.EnvironmentKey, Environments.Development);
     }
 

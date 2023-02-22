@@ -16,13 +16,19 @@ namespace MockSocket.Core.Services
         {
             logger.LogDebug($"交换连接开始：{client1.Id} <=> {client2.Id}");
 
+            using var srcClient = client1;
+            using var dstClient = client2;
+
             try
             {
                 var task1 = ForwardAsync(client1, client2, cancellationToken);
 
                 var task2 = ForwardAsync(client2, client1, cancellationToken);
 
-                await Task.WhenAny(task1, task2);
+                await await Task.WhenAny(task1, task2);
+            }
+            catch (Exception)
+            {
             }
             finally
             {
