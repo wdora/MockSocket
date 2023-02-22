@@ -83,7 +83,16 @@ namespace MockSocket.Core.Tcp
             return (Type.GetType(typeNameRaw)!, buffer.Slice(0, dataLen));
         }
 
-        public async ValueTask Register(Action callback)
+        public CancellationToken Register(CancellationToken cancellationToken)
+        {
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            _ = Cancel(cts);
+
+            return cts.Token;
+        }
+
+        private async ValueTask Cancel(CancellationTokenSource cts)
         {
             try
             {
@@ -92,18 +101,17 @@ namespace MockSocket.Core.Tcp
                     bool part1 = _socket.Poll(1000, SelectMode.SelectRead);
                     bool part2 = _socket.Available == 0;
                     if (part1 && part2)
-                    {
-                        Console.WriteLine("主动检测到连接断开");
                         return;
-                    }
 
-                    Console.WriteLine("主动检测" + new { part1, part2 });
+                    // usually { part1 = False, part2 = True }
                     await Task.Delay(1000);
                 }
             }
             finally
             {
-                callback();
+                Console.WriteLine("主动检测到连接断开");
+                cts.Cancel();
+                cts.Dispose();
             }
         }
     }

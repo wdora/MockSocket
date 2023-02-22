@@ -51,17 +51,15 @@ namespace MockSocket.Server
         {
             using var client = CurrentContext.Agent = agent;
 
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            _ = client.Register(cts.Cancel);
+            var token = client.Register(cancellationToken);
 
             while (true)
             {
-                var command = await client.ReceiveAsync<ICmd>(cts.Token);
+                var command = await client.ReceiveAsync<ICmd>(token);
 
                 logger.LogDebug($"{client.Id}: {command}");
 
-                await mediator.Send(command as object, cts.Token);
+                await mediator.Send(command as object, token);
             }
         }
     }
