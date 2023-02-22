@@ -16,7 +16,7 @@ namespace MockSocket.Agent
         private readonly IPairService pairService;
 
         private MockTcpClient agent = null!;
-        private CancellationTokenSource cts;
+        private CancellationTokenSource cts = null!;
 
         public MockAgent(IOptions<MockAgentConfig> config, ILogger<MockAgent> logger, IPairService pairService)
         {
@@ -29,7 +29,9 @@ namespace MockSocket.Agent
         {
             var core = StartCoreAsync;
 
-            return core.RetryAsync(cancellationToken: cancellationToken);
+            cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            return core.RetryAsync(cancellationToken: cts.Token);
         }
 
         public async ValueTask StartCoreAsync(CancellationToken cancellationToken)
@@ -46,13 +48,11 @@ namespace MockSocket.Agent
 
             await CreateAppServerAsync();
 
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var token = RegisterHeartBeat(cancellationToken);
 
-            var heartTask = HeartBeatAsync(cts);
+            var handleTask = HandleNewClientAsync(token);
 
-            var handleTask = HandleNewClientAsync(cts.Token);
-
-            await await Task.WhenAny(heartTask, handleTask);
+            await handleTask;
         }
 
         private async Task HandleNewClientAsync(CancellationToken cancellationToken)
@@ -115,17 +115,28 @@ namespace MockSocket.Agent
             logger.LogInformation("创建服务成功，远程服务:{0}, 本地服务:{1}", appServerEP, realServerEP);
         }
 
-        private async Task HeartBeatAsync(CancellationTokenSource cancellationTokenSource)
+        private CancellationToken RegisterHeartBeat(CancellationToken token)
         {
-            var cancellationToken = cancellationTokenSource.Token;
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+
+            var cancellationToken = cts.Token;
 
             var heartInterval = TimeSpan.FromSeconds(config.HeartInterval);
 
+            _ = HeartBeatAsync(cts, heartInterval, cancellationToken);
+
+            return cancellationToken;
+
+
+        }
+
+        private async Task HeartBeatAsync(CancellationTokenSource cts, TimeSpan heartInterval, CancellationToken cancellationToken)
+        {
             try
             {
                 while (true)
                 {
-                    await agent.SendAsync(new HeartBeatCmd(new { DateTime.Now, heartInterval }.ToString()!), cancellationToken);
+                    await agent.SendAsync(new HeartBeatCmd(new { DateTime.Now, heartInterval }.ToString()!));
 
                     logger.LogDebug("心跳成功");
 
@@ -136,9 +147,9 @@ namespace MockSocket.Agent
             {
                 logger.LogInformation("心跳失败,与服务器断开连接");
 
-                cancellationTokenSource.Cancel();
+                cts.Cancel();
 
-                throw;
+                cts.Dispose();
             }
         }
 

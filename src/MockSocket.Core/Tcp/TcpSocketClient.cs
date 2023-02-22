@@ -6,6 +6,11 @@ namespace MockSocket.Core.Tcp
     {
         protected Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
+        ~TcpSocketClient()
+        {
+            Dispose(false);
+        }
+
         public ValueTask DisconnectAsync()
         {
             return _socket.DisconnectAsync(false);
@@ -30,17 +35,19 @@ namespace MockSocket.Core.Tcp
 
         public void Dispose()
         {
-            try
-            {
-                // https://github.com/dotnet/runtime/issues/26957
-                // Disposing socket on Linux does not interrupt poll/select
-                _socket.Shutdown(SocketShutdown.Both);
-            }
-            catch (Exception) { }
-            finally
-            {
-                _socket.Dispose();
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private int _disposed; // 0 == false, anything else == true
+
+        private void Dispose(bool disposing)
+        {
+            // Make sure we're the first call to Dispose
+            if (Interlocked.CompareExchange(ref _disposed, 1, 0) == 1)
+                return;
+
+            _socket.Dispose();
         }
     }
 }
