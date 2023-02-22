@@ -19,13 +19,13 @@
             }
         }
 
-        public static async ValueTask RetryAsync(this ValueTask valueTask, int retryIntervalSeconds = 3, CancellationToken cancellationToken = default)
+        public static async ValueTask RetryAsync(this Func<CancellationToken, ValueTask> valueTask, int retryIntervalSeconds = 3, CancellationToken cancellationToken = default)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    await valueTask;
+                    await valueTask(cancellationToken);
 
                     return;
                 }

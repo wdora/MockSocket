@@ -27,9 +27,9 @@ namespace MockSocket.Agent
 
         public ValueTask StartAsync(CancellationToken cancellationToken = default)
         {
-            cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            var core = StartCoreAsync;
 
-            return StartCoreAsync(cts.Token).RetryAsync(cancellationToken: cts.Token);
+            return core.RetryAsync(cancellationToken: cancellationToken);
         }
 
         public async ValueTask StartCoreAsync(CancellationToken cancellationToken)
@@ -52,7 +52,7 @@ namespace MockSocket.Agent
 
             var handleTask = HandleNewClientAsync(cts.Token);
 
-            await Task.WhenAny(heartTask, handleTask);
+            await await Task.WhenAny(heartTask, handleTask);
         }
 
         private async Task HandleNewClientAsync(CancellationToken cancellationToken)
@@ -110,9 +110,9 @@ namespace MockSocket.Agent
 
             var appServerEP = $"{config.AppServer.Protocal}://{config.RemoteServer.Host}:{config.AppServer.Port}";
 
-            var realServerEP = $"{config.RealServer}";
+            var realServerEP = $"{config.AppServer.Protocal}://{config.RealServer}";
 
-            logger.LogDebug("创建服务成功，远程服务:{0},本地服务:{1}", appServerEP, realServerEP);
+            logger.LogDebug("创建服务成功，远程服务:{0}, 本地服务:{1}", appServerEP, realServerEP);
         }
 
         private async Task HeartBeatAsync(CancellationTokenSource cancellationTokenSource)
@@ -132,9 +132,9 @@ namespace MockSocket.Agent
                     await Task.Delay(heartInterval, cancellationToken);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                logger.LogError(e, "心跳失败");
+                logger.LogDebug("心跳失败");
 
                 cancellationTokenSource.Cancel();
 
@@ -144,13 +144,12 @@ namespace MockSocket.Agent
 
         public ValueTask StopAsync()
         {
-            logger.LogInformation("停止服务");
-
             cts.Cancel();
 
             agent?.Dispose();
 
             logger.LogInformation("停止服务成功");
+
             return default;
         }
     }
