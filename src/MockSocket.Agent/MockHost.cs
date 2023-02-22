@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MockSocket.Agent;
 using MockSocket.Core.Extensions;
 using NLog.Extensions.Logging;
+using System.Diagnostics;
 
 class MockHost
 {
@@ -12,11 +12,11 @@ class MockHost
 
     public MockHost(string[] args)
     {
+        // for host config
+        SetEnv();
+
         host = Host
             .CreateDefaultBuilder(args)
-#if DEBUG
-            .ConfigureHostConfiguration(config => config.AddInMemoryCollection(new Dictionary<string, string?> { { HostDefaults.EnvironmentKey, Environments.Development } }))
-#endif
             .ConfigureServices((hostContext, services) =>
             {
                 var config = hostContext.Configuration;
@@ -28,12 +28,18 @@ class MockHost
                     .AddLogging(builder =>
                     {
                         builder.ClearProviders();
-                        
+
                         builder.AddNLog();
                         NLog.LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
                     });
             })
             .Build();
+    }
+
+    [Conditional("DEBUG")]
+    private void SetEnv()
+    {
+        Environment.SetEnvironmentVariable("DOTNET_" + HostDefaults.EnvironmentKey, Environments.Development);
     }
 
     public void Start() => host.Start();

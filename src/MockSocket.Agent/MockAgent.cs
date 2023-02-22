@@ -36,11 +36,11 @@ namespace MockSocket.Agent
         {
             var (host, port) = config.RemoteServer;
 
-            logger.LogDebug($"正在连接服务器 {config.RemoteServer} ...");
+            logger.LogInformation($"正在连接服务器 {config.RemoteServer} ...");
 
             agent = await TcpSocketFactory.Create(host, port);
 
-            logger.LogDebug("连接服务器成功");
+            logger.LogInformation("连接服务器成功");
 
             using var client = agent;
 
@@ -112,7 +112,7 @@ namespace MockSocket.Agent
 
             var realServerEP = $"{config.AppServer.Protocal}://{config.RealServer}";
 
-            logger.LogDebug("创建服务成功，远程服务:{0}, 本地服务:{1}", appServerEP, realServerEP);
+            logger.LogInformation("创建服务成功，远程服务:{0}, 本地服务:{1}", appServerEP, realServerEP);
         }
 
         private async Task HeartBeatAsync(CancellationTokenSource cancellationTokenSource)
@@ -134,7 +134,7 @@ namespace MockSocket.Agent
             }
             catch (Exception)
             {
-                logger.LogDebug("心跳失败");
+                logger.LogInformation("心跳失败,与服务器断开连接");
 
                 cancellationTokenSource.Cancel();
 
