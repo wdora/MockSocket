@@ -16,7 +16,6 @@ namespace MockSocket.Agent
         private readonly IPairService pairService;
 
         private MockTcpClient agent = null!;
-        private CancellationTokenSource cts = null!;
 
         public MockAgent(IOptions<MockAgentConfig> config, ILogger<MockAgent> logger, IPairService pairService)
         {
@@ -29,9 +28,7 @@ namespace MockSocket.Agent
         {
             var core = StartCoreAsync;
 
-            cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-
-            return core.RetryAsync(cancellationToken: cts.Token);
+            return core.WithRetryAsync(cancellationToken: cancellationToken);
         }
 
         public async ValueTask StartCoreAsync(CancellationToken cancellationToken)
@@ -155,8 +152,6 @@ namespace MockSocket.Agent
 
         public ValueTask StopAsync()
         {
-            cts.Cancel();
-
             agent?.Dispose();
 
             logger.LogInformation("停止服务成功");

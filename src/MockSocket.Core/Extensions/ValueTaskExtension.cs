@@ -19,18 +19,22 @@
             }
         }
 
-        public static async ValueTask RetryAsync(this Func<CancellationToken, ValueTask> valueTask, int retryIntervalSeconds = 3, CancellationToken cancellationToken = default)
+        public static async ValueTask WithRetryAsync(this Func<CancellationToken, ValueTask> valueTask, int retryIntervalSeconds = 3, CancellationToken cancellationToken = default)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
                 try
                 {
-                    await valueTask(cancellationToken);
+                    await valueTask(cts.Token);
 
                     return;
                 }
                 catch (Exception)
                 {
+                    cts.Cancel();
+
                     var delay = TimeSpan.FromSeconds(retryIntervalSeconds);
 
                     await Task.Delay(delay);

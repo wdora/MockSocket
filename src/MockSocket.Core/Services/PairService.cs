@@ -14,29 +14,35 @@ namespace MockSocket.Core.Services
 
         public async ValueTask PairAsync(MockTcpClient client1, MockTcpClient client2, CancellationToken cancellationToken)
         {
-            logger.LogDebug($"交换连接开始：{client1.Id} <=> {client2.Id}");
+            logger.LogInformation($"交换连接开始：{client1.Id} <=> {client2.Id}");
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             using var srcClient = client1;
             using var dstClient = client2;
 
             try
             {
-                var task1 = ForwardAsync(client1, client2, cancellationToken);
+                using var task1 = SwapAsync(client1, client2, cts.Token);
 
-                var task2 = ForwardAsync(client2, client1, cancellationToken);
+                using var task2 = SwapAsync(client2, client1, cts.Token);
 
-                await await Task.WhenAny(task1, task2);
+                var anyTask = await Task.WhenAny(task1, task2);
+
+                cts.Cancel();
+
+                await Task.WhenAll(task1, task2);
             }
             catch (Exception)
             {
             }
             finally
             {
-                logger.LogDebug($"交换连接结束：{client1.Id} <=> {client2.Id}");
+                logger.LogInformation($"交换连接结束：{client1.Id} <=> {client2.Id}");
             }
         }
 
-        static Task ForwardAsync(MockTcpClient send, MockTcpClient receive, CancellationToken cancellationToken)
+        static Task SwapAsync(MockTcpClient send, MockTcpClient receive, CancellationToken cancellationToken)
         {
             return BufferPool.Instance.Run(async memory =>
             {
