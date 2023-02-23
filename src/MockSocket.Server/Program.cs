@@ -3,7 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MockSocket.Core.Services;
+using MockSocket.Core.Extensions;
 using MockSocket.Server;
 using NLog.Extensions.Logging;
 using System.Reflection;
@@ -18,9 +18,8 @@ var host = Host
 
         services
             .AddMemoryCache()
-            .AddSingleton<IPairService, PairService>()
             .AddSingleton<IMockServer, MockServer>()
-            .AddTransient<IMockTcpServer, MockTcpServer>()
+            .AddMockServer(config.GetSection("MockSocket"))
             .AddHostedService<MockHostService>()
             .AddLogging(builder => builder.ClearProviders().AddNLog())
             .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
