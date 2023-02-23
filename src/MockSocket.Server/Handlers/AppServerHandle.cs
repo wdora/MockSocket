@@ -25,7 +25,7 @@ namespace MockSocket.Server.Handlers
         {
             await server.ListenAsync(request.Port);
 
-            await CurrentContext.Agent.SendAsync(true);
+            await CurrentContext.Agent.SendCmdAsync(true);
 
             _ = LoopAsync(server, cancellationToken);
         }
@@ -40,7 +40,7 @@ namespace MockSocket.Server.Handlers
 
                 logger.LogInformation($"userClient {userClient.Id} is coming");
 
-                await CurrentContext.Agent.SendAsync(userClient.Id);
+                await CurrentContext.Agent.SendCmdAsync(userClient.Id);
 
                 cacheService.Set(userClient.Id, userClient);
             }

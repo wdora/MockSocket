@@ -12,7 +12,7 @@ namespace MockSocket.Core.Services
             this.logger = logger;
         }
 
-        public async ValueTask PairAsync(MockTcpClient client1, MockTcpClient client2, CancellationToken cancellationToken)
+        public async ValueTask PairAsync(IMockTcpClient client1, IMockTcpClient client2, CancellationToken cancellationToken)
         {
             logger.LogInformation($"交换连接开始：{client1.Id} <=> {client2.Id}");
 
@@ -42,7 +42,7 @@ namespace MockSocket.Core.Services
             }
         }
 
-        static Task SwapAsync(MockTcpClient send, MockTcpClient receive, CancellationToken cancellationToken)
+        static Task SwapAsync(IMockTcpClient send, IMockTcpClient receive, CancellationToken cancellationToken)
         {
             return BufferPool.Instance.Run(async memory =>
             {

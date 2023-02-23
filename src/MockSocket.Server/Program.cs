@@ -18,9 +18,9 @@ var host = Host
 
         services
             .AddMemoryCache()
+            .AddHostedService<MockHostService>()
             .AddSingleton<IMockServer, MockServer>()
             .AddMockServer(config.GetSection("MockSocket"))
-            .AddHostedService<MockHostService>()
             .AddLogging(builder => builder.ClearProviders().AddNLog())
             .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
     })

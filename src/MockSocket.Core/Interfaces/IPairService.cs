@@ -4,6 +4,6 @@ namespace MockSocket.Core.Interfaces
 {
     public interface IPairService
     {
-        ValueTask PairAsync(MockTcpClient realClient, MockTcpClient dataClient, CancellationToken cancellationToken);
+        ValueTask PairAsync(IMockTcpClient realClient, IMockTcpClient dataClient, CancellationToken cancellationToken);
     }
 }

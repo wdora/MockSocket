@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket", "src\MockSocket\MockSocket.csproj", "{B7ADFCE3-69B9-4DD0-BBA4-F63C392B06FA}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2559AD34-193B-46BD-8308-2B979CDFB193}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Server", "src\MockSocket.Server\MockSocket.Server.csproj", "{7C50F4B2-019B-4032-8A56-441CB220BFCB}"
@@ -33,7 +31,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockSocket.Core", "src\MockSocket.Core\MockSocket.Core.csproj", "{EE171F3A-ADEF-4064-A1BF-E56EA89E1F85}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Core", "src\MockSocket.Core\MockSocket.Core.csproj", "{EE171F3A-ADEF-4064-A1BF-E56EA89E1F85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +39,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B7ADFCE3-69B9-4DD0-BBA4-F63C392B06FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B7ADFCE3-69B9-4DD0-BBA4-F63C392B06FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B7ADFCE3-69B9-4DD0-BBA4-F63C392B06FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B7ADFCE3-69B9-4DD0-BBA4-F63C392B06FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7C50F4B2-019B-4032-8A56-441CB220BFCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7C50F4B2-019B-4032-8A56-441CB220BFCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C50F4B2-019B-4032-8A56-441CB220BFCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -74,7 +68,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{B7ADFCE3-69B9-4DD0-BBA4-F63C392B06FA} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 		{7C50F4B2-019B-4032-8A56-441CB220BFCB} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 		{379151D7-E0AB-4451-AE58-4FF1187E85D5} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 		{CD2A7B18-625E-40B6-9A22-2EC5B8DC77A0} = {9029273C-1B38-4070-B690-6256F4CD207C}

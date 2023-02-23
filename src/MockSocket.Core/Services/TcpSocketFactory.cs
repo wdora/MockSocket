@@ -1,21 +1,30 @@
-﻿namespace MockSocket.Core.Services
+﻿using MockSocket.Core.Interfaces;
+using System.Net.Sockets;
+
+namespace MockSocket.Core.Services
 {
     public class TcpSocketFactory
     {
-        public static async ValueTask<MockTcpClient> Create(string host, int port)
+        public static async ValueTask<IMockTcpClient> Create(string host, int port)
         {
-            var client = new MockTcpClient();
+            var so = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
             try
             {
-                await client.ConnectAsync(host, port);
+                await so.ConnectAsync(host, port);
 
-                return client;
+                return Create(so);
             }
             catch (Exception)
             {
-                client.Dispose();
+                so.Dispose();
                 throw;
             }
+        }
+
+        public static IMockTcpClient Create(Socket client)
+        {
+            return new MockTcpClient(client);
         }
     }
 }

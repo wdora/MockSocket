@@ -1,21 +1,18 @@
-﻿using System.Net.Sockets;
+﻿using MockSocket.Core.Interfaces;
+using System.Net.Sockets;
 using System.Text;
 
 namespace MockSocket.Core.Services
 {
-    public class MockTcpClient : TcpSocketClient
+    public class MockTcpClient : TcpSocketClient, IMockTcpClient
     {
         private const int HEADCOUNT = 5;
 
-        public MockTcpClient()
-        {
-        }
-
-        public MockTcpClient(Socket client) => _socket = client;
+        public MockTcpClient(Socket client) : base(client) { }
 
         public string Id => $"{_socket.LocalEndPoint}-{_socket.RemoteEndPoint}";
 
-        public ValueTask SendAsync<T>(T model, CancellationToken cancellationToken = default)
+        public ValueTask SendCmdAsync<T>(T model, CancellationToken cancellationToken = default)
         {
             return BufferPool.Instance.Run(async buffer =>
             {
@@ -43,7 +40,7 @@ namespace MockSocket.Core.Services
             return dataLen + typeNameLength + HEADCOUNT;
         }
 
-        public ValueTask<T> ReceiveAsync<T>(CancellationToken cancellationToken = default)
+        public ValueTask<T> ReceiveCmdAsync<T>(CancellationToken cancellationToken = default)
         {
             return BufferPool.Instance.Run(async buffer =>
             {

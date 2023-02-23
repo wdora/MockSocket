@@ -18,11 +18,11 @@ namespace MockSocket.Server
             this.logger = logger;
         }
 
-        public async ValueTask<MockTcpClient> AcceptAsync(CancellationToken cancellationToken)
+        public async ValueTask<IMockTcpClient> AcceptAsync(CancellationToken cancellationToken)
         {
             var client = await _socket.AcceptAsync(cancellationToken);
 
-            return new MockTcpClient(client);
+            return TcpSocketFactory.Create(client);
         }
 
         public void Dispose()

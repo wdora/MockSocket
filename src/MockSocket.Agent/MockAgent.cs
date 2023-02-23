@@ -15,7 +15,7 @@ namespace MockSocket.Agent
         private readonly ILogger<MockAgent> logger;
         private readonly IPairService pairService;
 
-        private MockTcpClient agent = null!;
+        private IMockTcpClient agent = null!;
 
         public MockAgent(IOptions<MockAgentConfig> config, ILogger<MockAgent> logger, IPairService pairService)
         {
@@ -56,7 +56,7 @@ namespace MockSocket.Agent
         {
             while (true)
             {
-                var userClientId = await agent.ReceiveAsync<string>();
+                var userClientId = await agent.ReceiveCmdAsync<string>();
 
                 logger.LogInformation($"userClient {userClientId} is coming");
 
@@ -75,18 +75,18 @@ namespace MockSocket.Agent
             }
         }
 
-        private async ValueTask<MockTcpClient> CreateDataClientAsync(string userClientId)
+        private async ValueTask<IMockTcpClient> CreateDataClientAsync(string userClientId)
         {
             var (host, port) = config.RemoteServer;
 
             var connection = await TcpSocketFactory.Create(host, port);
 
-            await connection.SendAsync(new DataClientCmd(userClientId));
+            await connection.SendCmdAsync(new DataClientCmd(userClientId));
 
             return connection;
         }
 
-        private ValueTask<MockTcpClient> CreateRealClientAsync()
+        private ValueTask<IMockTcpClient> CreateRealClientAsync()
         {
             var (host, port) = config.RealServer;
 
@@ -97,9 +97,9 @@ namespace MockSocket.Agent
         {
             var appServer = config.AppServer;
 
-            await agent.SendAsync(new CreateAppServerCmd(appServer.Port, appServer.Protocal));
+            await agent.SendCmdAsync(new CreateAppServerCmd(appServer.Port, appServer.Protocal));
 
-            var isOk = await agent.ReceiveAsync<bool>()
+            var isOk = await agent.ReceiveCmdAsync<bool>()
                         .TimeoutAsync(() => false);
 
             if (!isOk)
@@ -133,7 +133,7 @@ namespace MockSocket.Agent
             {
                 while (true)
                 {
-                    await agent.SendAsync(new HeartBeatCmd(new { DateTime.Now, heartInterval }.ToString()!));
+                    await agent.SendCmdAsync(new HeartBeatCmd(new { DateTime.Now, heartInterval }.ToString()!));
 
                     logger.LogDebug("心跳成功");
 

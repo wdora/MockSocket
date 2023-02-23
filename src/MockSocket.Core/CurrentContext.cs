@@ -1,12 +1,12 @@
-﻿using MockSocket.Core.Services;
+﻿using MockSocket.Core.Interfaces;
 
 namespace MockSocket.Server
 {
     public class CurrentContext
     {
-        static AsyncLocal<MockTcpClient> LocalAgent = new AsyncLocal<MockTcpClient>();
+        static AsyncLocal<IMockTcpClient> LocalAgent = new AsyncLocal<IMockTcpClient>();
 
-        public static MockTcpClient Agent
+        public static IMockTcpClient Agent
         {
             get => LocalAgent.Value!;
 

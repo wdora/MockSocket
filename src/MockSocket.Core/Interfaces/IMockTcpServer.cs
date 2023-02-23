@@ -4,7 +4,7 @@ namespace MockSocket.Core.Interfaces
 {
     public interface IMockTcpServer : IDisposable
     {
-        ValueTask<MockTcpClient> AcceptAsync(CancellationToken cancellationToken);
+        ValueTask<IMockTcpClient> AcceptAsync(CancellationToken cancellationToken);
 
         ValueTask ListenAsync(int listenPort);
     }

@@ -14,6 +14,7 @@ namespace MockSocket.Core.Extensions
             return services
                 .Configure<MockAgentConfig>(config)
                 .AddSingleton<IPairService, PairService>()
+                .AddTransient<IMockTcpClient, MockTcpClient>()
                 .AddSingleton<IEncodeService, JsonEncodeService>();
         }
 
@@ -21,8 +22,9 @@ namespace MockSocket.Core.Extensions
         {
             return services
                 .Configure<MockServerConfig>(config)
-                .AddTransient<IMockTcpServer, MockTcpServer>()
                 .AddSingleton<IPairService, PairService>()
+                .AddTransient<IMockTcpClient, MockTcpClient>()
+                .AddTransient<IMockTcpServer, MockTcpServer>()
                 .AddSingleton<IEncodeService, JsonEncodeService>();
         }
     }

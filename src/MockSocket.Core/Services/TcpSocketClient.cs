@@ -5,7 +5,12 @@ namespace MockSocket.Core.Services
 {
     public abstract class TcpSocketClient : ITcpClient
     {
-        protected Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        protected Socket _socket;
+
+        protected TcpSocketClient(Socket socket)
+        {
+            _socket = socket;
+        }
 
         ~TcpSocketClient()
         {
@@ -48,7 +53,7 @@ namespace MockSocket.Core.Services
             if (Interlocked.CompareExchange(ref _disposed, 1, 0) == 1)
                 return;
 
-            _socket.Dispose();
+            _socket?.Dispose();
         }
     }
 }

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using MockSocket.Core.Commands;
 using MockSocket.Core.Configurations;
 using MockSocket.Core.Interfaces;
-using MockSocket.Core.Services;
 
 namespace MockSocket.Server
 {
@@ -39,7 +38,7 @@ namespace MockSocket.Server
         }
 
 
-        private async Task HandleAgentAsync(MockTcpClient agent, CancellationToken cancellationToken)
+        private async Task HandleAgentAsync(IMockTcpClient agent, CancellationToken cancellationToken)
         {
             using var client = CurrentContext.Agent = agent;
 
@@ -47,7 +46,7 @@ namespace MockSocket.Server
 
             while (true)
             {
-                var command = await client.ReceiveAsync<ICmd>(token);
+                var command = await client.ReceiveCmdAsync<ICmd>(token);
 
                 logger.LogDebug($"{client.Id}: {command}");
 
