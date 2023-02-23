@@ -1,4 +1,4 @@
-﻿namespace MockSocket.Core.Tcp
+﻿namespace MockSocket.Core.Services
 {
     public class TcpSocketFactory
     {

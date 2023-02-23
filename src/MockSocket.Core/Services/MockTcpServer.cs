@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MockSocket.Core.Interfaces;
-using MockSocket.Core.Tcp;
+using MockSocket.Core.Services;
 using System.Net;
 using System.Net.Sockets;
 

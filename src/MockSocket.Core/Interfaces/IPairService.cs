@@ -1,6 +1,6 @@
-﻿using MockSocket.Core.Tcp;
+﻿using MockSocket.Core.Services;
 
-namespace MockSocket.Core.Services
+namespace MockSocket.Core.Interfaces
 {
     public interface IPairService
     {

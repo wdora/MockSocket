@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using MockSocket.Core.Tcp;
+using MockSocket.Core.Interfaces;
 
 namespace MockSocket.Core.Services
 {

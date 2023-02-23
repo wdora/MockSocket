@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using MockSocket.Core.Commands;
 using MockSocket.Core.Configurations;
 using MockSocket.Core.Interfaces;
-using MockSocket.Core.Tcp;
+using MockSocket.Core.Services;
 
 namespace MockSocket.Server
 {

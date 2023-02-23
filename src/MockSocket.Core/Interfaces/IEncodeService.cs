@@ -1,4 +1,4 @@
-﻿namespace MockSocket.Core.Services
+﻿namespace MockSocket.Core.Interfaces
 {
     public interface IEncodeService
     {

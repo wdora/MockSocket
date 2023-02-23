@@ -4,8 +4,8 @@ using MockSocket.Core.Commands;
 using MockSocket.Core.Configurations;
 using MockSocket.Core.Exceptions;
 using MockSocket.Core.Extensions;
+using MockSocket.Core.Interfaces;
 using MockSocket.Core.Services;
-using MockSocket.Core.Tcp;
 
 namespace MockSocket.Agent
 {

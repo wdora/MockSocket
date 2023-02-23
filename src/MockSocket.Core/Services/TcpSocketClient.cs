@@ -1,6 +1,7 @@
 ﻿using System.Net.Sockets;
+using MockSocket.Core.Interfaces;
 
-namespace MockSocket.Core.Tcp
+namespace MockSocket.Core.Services
 {
     public abstract class TcpSocketClient : ITcpClient
     {

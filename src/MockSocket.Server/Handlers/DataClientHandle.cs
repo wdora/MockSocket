@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using MockSocket.Core.Commands;
+using MockSocket.Core.Interfaces;
 using MockSocket.Core.Services;
-using MockSocket.Core.Tcp;
 
 namespace MockSocket.Server.Handlers
 {

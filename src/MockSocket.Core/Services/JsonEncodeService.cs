@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using MockSocket.Core.Interfaces;
 
 namespace MockSocket.Core.Services
 {

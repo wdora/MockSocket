@@ -1,4 +1,4 @@
-﻿namespace MockSocket.Core.Tcp
+﻿namespace MockSocket.Core.Interfaces
 {
 
     public interface ITcpClient : ITcpConnection, IDisposable

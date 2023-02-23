@@ -1,8 +1,7 @@
 ﻿using System.Net.Sockets;
 using System.Text;
-using MockSocket.Core.Services;
 
-namespace MockSocket.Core.Tcp
+namespace MockSocket.Core.Services
 {
     public class MockTcpClient : TcpSocketClient
     {
