@@ -18,7 +18,7 @@
         /// <param name="bytes"></param>
         /// <param name="len"></param>
         /// <returns></returns>
-        T? Decode<T>(ReadOnlyMemory<byte> bytes, int len) where T : class;
+        T? Decode<T>(ReadOnlyMemory<byte> bytes, int len);
 
 
         object? Decode(ReadOnlyMemory<byte> bytes, int len, Type type);

@@ -1,36 +1,24 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using BenchmarkDotNet.Attributes;
-using MockSocket;
-using MockSocket.Message;
+using MockSocket.Core.Commands;
+using MockSocket.Core.Services;
 
 [MemoryDiagnoser]
 public class EncodeBencmarks
 {
     Memory<byte> buffer = new byte[1024];
-    Memory<byte> buffer2 = new byte[1024];
 
-    string data = Guid.NewGuid().ToString();
-
-    IEncoder encoder = new JsonEncoder();
+    HeartBeatCmd model = new HeartBeatCmd(DateTime.Now.ToLongTimeString());
 
     [Benchmark(Baseline = true)]
-    public void EncodeAndDecode()
+    public void JsonEncode()
     {
-        MessageEncoding.Encode<string>(data, buffer);
-        MessageEncoding.Decode<string>(buffer.Span);
+        JsonEncodeService.Instance.Encode(model, buffer);
     }
 
     [Benchmark]
-    public void FastEncodeAndDecode()
+    public void FastJsonDecode()
     {
-        MessageEncoding.FastEncode(data, buffer);
-        MessageEncoding.FastDecode(buffer.Span);
-    }
-
-    [Benchmark]
-    public void Encoder_Decoder()
-    {
-        var len = encoder.Encode(data, buffer2);
-        encoder.Decode<string>(buffer2, len);
+        new MyJsonEncodeService().Encode(model, buffer);
     }
 }
