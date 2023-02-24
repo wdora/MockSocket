@@ -6,6 +6,7 @@ using MockSocket.Core.Exceptions;
 using MockSocket.Core.Extensions;
 using MockSocket.Core.Interfaces;
 using MockSocket.Core.Services;
+using MockSocket.Core.ValueObject;
 
 namespace MockSocket.Agent
 {
@@ -58,7 +59,9 @@ namespace MockSocket.Agent
             {
                 var userClientId = await agent.ReceiveCmdAsync<string>();
 
-                logger.LogInformation($"userClient {userClientId} is coming");
+                var connectionId = new ConnectionId(userClientId);
+
+                logger.LogInformation($"userClient connect appPort: {connectionId.LocalEP.Port} with ip ({connectionId.RemoteEP})");
 
                 try
                 {
