@@ -15,6 +15,7 @@ namespace MockSocket.Core.Extensions
                 .Configure<MockAgentConfig>(config)
                 .AddSingleton<IPairService, PairService>()
                 .AddTransient<IMockTcpClient, MockTcpClient>()
+                .AddSingleton<ILimitIPService, LimitIPService>()
                 .AddSingleton<IEncodeService, JsonEncodeService>();
         }
 

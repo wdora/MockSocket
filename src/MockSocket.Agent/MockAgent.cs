@@ -18,11 +18,14 @@ namespace MockSocket.Agent
 
         private IMockTcpClient agent = null!;
 
-        public MockAgent(IOptions<MockAgentConfig> config, ILogger<MockAgent> logger, IPairService pairService)
+        ILimitIPService limitIPService;
+
+        public MockAgent(IOptions<MockAgentConfig> config, ILogger<MockAgent> logger, IPairService pairService, ILimitIPService limitIPService)
         {
             this.config = config.Value;
             this.logger = logger;
             this.pairService = pairService;
+            this.limitIPService = limitIPService;
         }
 
         public ValueTask StartAsync(CancellationToken cancellationToken = default)
@@ -65,6 +68,11 @@ namespace MockSocket.Agent
 
                 try
                 {
+                    var isValid = await limitIPService.ValidAsync(connectionId.RemoteEP.Address);
+
+                    if (!isValid)
+                        continue;
+
                     var realClient = await CreateRealClientAsync();
 
                     var dataClient = await CreateDataClientAsync(userClientId);
