@@ -134,8 +134,6 @@ namespace MockSocket.Agent
             _ = HeartBeatAsync(cts, heartInterval, cancellationToken);
 
             return cancellationToken;
-
-
         }
 
         private async Task HeartBeatAsync(CancellationTokenSource cts, TimeSpan heartInterval, CancellationToken cancellationToken)
