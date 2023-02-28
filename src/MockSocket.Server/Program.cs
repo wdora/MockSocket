@@ -14,14 +14,12 @@ var host = Host
     {
         var config = context.Configuration;
 
-        NLog.LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
-
         services
             .AddMemoryCache()
             .AddHostedService<MockHostService>()
             .AddSingleton<IMockServer, MockServer>()
-            .AddMockServer(config.GetSection("MockSocket"))
-            .AddLogging(builder => builder.ClearProviders().AddNLog())
+            .AddMockServer(config)
+            .AddLogging(builder => builder.ClearProviders().AddNLog(config))
             .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
     })
     .Build();

@@ -22,15 +22,9 @@ class MockHost
 
                 services
                     .AddHostedService<MockHostService>()
-                    .AddAgent(config.GetSection("MockSocket"))
+                    .AddAgent(config)
                     .AddSingleton<IMockAgent, MockAgent>()
-                    .AddLogging(builder =>
-                    {
-                        builder.ClearProviders();
-
-                        builder.AddNLog();
-                        NLog.LogManager.Configuration = new NLogLoggingConfiguration(config.GetSection("NLog"));
-                    });
+                    .AddLogging(builder => builder.ClearProviders().AddNLog(config));
             })
             .Build();
     }
