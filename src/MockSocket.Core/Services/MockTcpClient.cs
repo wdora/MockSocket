@@ -103,6 +103,10 @@ namespace MockSocket.Core.Services
                     await Task.Delay(1000);
                 }
             }
+            catch
+            {
+
+            }
             finally
             {
                 Console.WriteLine("主动检测到连接断开");
