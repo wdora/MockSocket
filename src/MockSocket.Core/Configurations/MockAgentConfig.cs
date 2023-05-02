@@ -1,12 +1,30 @@
-﻿namespace MockSocket.Core.Configurations
+﻿using System.Net;
+using System.Net.Sockets;
+
+namespace MockSocket.Core.Configurations
 {
     public class MockAgentConfig
     {
-        public ServerEndpoint RemoteServer { get; set; } = new("wdora.com", 9090);
+        public ServerEndpoint MockServer { get; set; } = new("wdora.com", 9090);
+
+        public IPEndPoint UdpMockServer { get; set; } = GetIPEndpoint("localhost:9090");
+
+        public IPEndPoint UdpRealServer { get; set; } = GetIPEndpoint("localhost:3389");
+
+        private static IPEndPoint GetIPEndpoint(string hostOrAddressWithPort)
+        {
+            var arr = hostOrAddressWithPort.Split(':');
+
+            var ip = Dns.GetHostAddresses(arr[0]).First(x => x.AddressFamily == AddressFamily.InterNetwork);
+
+            return new IPEndPoint(ip, int.Parse(arr[1]));
+        }
 
         public ServerEndpoint RealServer { get; set; } = new("localhost", 3389);
 
         public AppServer AppServer { get; set; } = new(3389, "tcp");
+
+        public AppServer UdpAppServer { get; set; } = new(3390, "udp");
 
         public int HeartInterval { get; set; } = 30;
 

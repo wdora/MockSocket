@@ -1,4 +1,5 @@
 ﻿using MockSocket.Core.Interfaces;
+using System.Net;
 
 namespace MockSocket.Server
 {
@@ -12,5 +13,21 @@ namespace MockSocket.Server
 
             set => LocalAgent.Value = value;
         }
+
+        public static IMockUdpClient UdpAgent { get; }
+
+        public static IMockTcpClient CtrlAgent4Udp { get; set; }
+        
+        /// <summary>
+        /// 非AppServer
+        /// </summary>
+        public static IUdpServer UdpMockServer { get; set; }
+
+        public static IPEndPoint UdpEndPoint { get; set; }
+    }
+
+    public interface IMockUdpClient
+    {
+        string Id { get; }
     }
 }

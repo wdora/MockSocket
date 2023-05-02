@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\MockSocket.Core\MockSocket.Core.csproj" />
+		<ProjectReference Include="..\MockSocket.Udp\MockSocket.Udp.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

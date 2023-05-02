@@ -3,11 +3,11 @@ using MockSocket.Core.Interfaces;
 
 namespace MockSocket.Core.Services
 {
-    public class PairService : IPairService
+    public class TcpPairService : ITcpPairService
     {
         readonly ILogger logger;
 
-        public PairService(ILogger<PairService> logger)
+        public TcpPairService(ILogger<TcpPairService> logger)
         {
             this.logger = logger;
         }

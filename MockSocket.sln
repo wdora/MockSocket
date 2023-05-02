@@ -33,6 +33,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Core", "src\MockSocket.Core\MockSocket.Core.csproj", "{EE171F3A-ADEF-4064-A1BF-E56EA89E1F85}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Common", "src\MockSocket.Common\MockSocket.Common.csproj", "{1B0290A7-C52F-4AE9-B2B9-E52DB25B2807}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Udp", "src\MockSocket.Udp\MockSocket.Udp.csproj", "{822047E7-066B-4B42-ABF3-84825749A60A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +67,14 @@ Global
 		{EE171F3A-ADEF-4064-A1BF-E56EA89E1F85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE171F3A-ADEF-4064-A1BF-E56EA89E1F85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE171F3A-ADEF-4064-A1BF-E56EA89E1F85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B0290A7-C52F-4AE9-B2B9-E52DB25B2807}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B0290A7-C52F-4AE9-B2B9-E52DB25B2807}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B0290A7-C52F-4AE9-B2B9-E52DB25B2807}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B0290A7-C52F-4AE9-B2B9-E52DB25B2807}.Release|Any CPU.Build.0 = Release|Any CPU
+		{822047E7-066B-4B42-ABF3-84825749A60A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{822047E7-066B-4B42-ABF3-84825749A60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{822047E7-066B-4B42-ABF3-84825749A60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{822047E7-066B-4B42-ABF3-84825749A60A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +86,8 @@ Global
 		{C855C519-F4AE-4666-8502-4677A9748AC0} = {C4E37B38-6CFB-4CC5-AF23-BBD56EF263BB}
 		{BA379BB7-BF95-4F6D-9274-E8B1B6F6E00C} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 		{EE171F3A-ADEF-4064-A1BF-E56EA89E1F85} = {2559AD34-193B-46BD-8308-2B979CDFB193}
+		{1B0290A7-C52F-4AE9-B2B9-E52DB25B2807} = {2559AD34-193B-46BD-8308-2B979CDFB193}
+		{822047E7-066B-4B42-ABF3-84825749A60A} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {97F367FC-2651-49ED-962F-6A5BC9AA7F5C}

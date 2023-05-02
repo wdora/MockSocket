@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MockSocket.Server
+namespace MockSocket.Server2
 {
+    using IMockServer = MockClient.Udp.Interfaces.IMockServer;
+
     public class MockHostService : IHostedService
     {
         IMockServer mockServer;

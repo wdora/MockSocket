@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MockSocket.Agent;
+using MockClient.Udp.Interfaces;
 
 public class MockHostService : IHostedService
 {
+    // 没有Stop方法
     //foreach (IHostedService hostedService in _hostedServices)
     //{
     //    // Fire IHostedService.Start
@@ -16,8 +17,6 @@ public class MockHostService : IHostedService
     //}
 
     readonly IMockAgent agent;
-
-
     readonly ILogger logger;
 
     public MockHostService(IMockAgent agent, ILogger<MockHostService> logger)
@@ -43,6 +42,6 @@ public class MockHostService : IHostedService
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        await agent.StopAsync();
+        //await agent.StopAsync();
     }
 }

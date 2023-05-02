@@ -13,8 +13,7 @@ namespace MockSocket.Core.Extensions
         {
             return services
                 .Configure<MockAgentConfig>(config.GetSection("MockSocket"))
-                .AddSingleton<IPairService, PairService>()
-                .AddTransient<IMockTcpClient, MockTcpClient>()
+                .AddSingleton<ITcpPairService, TcpPairService>()
                 .AddSingleton<ILimitIPService, LimitIPService>()
                 .AddSingleton<IEncodeService, JsonEncodeService>();
         }
@@ -23,9 +22,12 @@ namespace MockSocket.Core.Extensions
         {
             return services
                 .Configure<MockServerConfig>(config.GetSection("MockSocket"))
-                .AddSingleton<IPairService, PairService>()
+                .AddSingleton<ITcpPairService, TcpPairService>()
                 .AddTransient<IMockTcpClient, MockTcpClient>()
                 .AddTransient<IMockTcpServer, MockTcpServer>()
+                .AddTransient<IUdpServer, MockUdpServer>()
+                .AddTransient<IMemorySerializer, MemorySerializer>()
+                .AddTransient<IBufferService, BufferService>()
                 .AddSingleton<IEncodeService, JsonEncodeService>();
         }
     }

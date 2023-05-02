@@ -1,14 +1,18 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MockSocket.Agent;
-using MockSocket.Core.Extensions;
+using MockClient.Udp.Interfaces;
 using NLog.Extensions.Logging;
 using System.Diagnostics;
+using System.Reflection;
 
 class MockHost
 {
     IHost host;
+
+    IMockAgent agent;
+
+    CancellationTokenSource tokenSource = new CancellationTokenSource();
 
     public MockHost(string[] args)
     {
@@ -21,12 +25,14 @@ class MockHost
                 var config = hostContext.Configuration;
 
                 services
-                    .AddHostedService<MockHostService>()
-                    .AddAgent(config)
-                    .AddSingleton<IMockAgent, MockAgent>()
-                    .AddLogging(builder => builder.ClearProviders().AddNLog(config));
+                    .AddUdpMockAgent()
+                    .AddMemoryCache()
+                    .AddLogging(builder => builder.ClearProviders().AddNLog(config))
+                    .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             })
             .Build();
+
+        agent = host.Services.GetService<IMockAgent>()!;
     }
 
     [Conditional("DEBUG")]
@@ -37,7 +43,7 @@ class MockHost
         Environment.SetEnvironmentVariable("DOTNET_" + HostDefaults.EnvironmentKey, Environments.Development);
     }
 
-    public void Start() => host.Start();
+    public void Start() => agent.StartAsync(tokenSource.Token);
 
-    public void Stop() => host.StopAsync().Wait();
+    public void Stop() => tokenSource.Cancel();
 }

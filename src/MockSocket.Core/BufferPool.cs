@@ -4,13 +4,14 @@ namespace MockSocket.Core
 {
     public class BufferPool
     {
-        private readonly int BUFFER_SIZE = 1024;
+        public const int BUFFER_SIZE = 1024;
+        public const int UDP_BUFFER_SIZE = 65536;
 
         public static BufferPool Instance { get; } = new BufferPool();
 
-        public async ValueTask Run(Func<Memory<byte>, ValueTask> func)
+        public async ValueTask Run(Func<Memory<byte>, ValueTask> func, int bufferSize = BUFFER_SIZE)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(BUFFER_SIZE);
+            var buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 
             try
             {
@@ -22,9 +23,9 @@ namespace MockSocket.Core
             }
         }
 
-        public async ValueTask<T> Run<T>(Func<Memory<byte>, ValueTask<T>> func)
+        public async ValueTask<T> Run<T>(Func<Memory<byte>, ValueTask<T>> func, int bufferSize = BUFFER_SIZE)
         {
-            var buffer = ArrayPool<byte>.Shared.Rent(BUFFER_SIZE);
+            var buffer = ArrayPool<byte>.Shared.Rent(bufferSize);
 
             try
             {

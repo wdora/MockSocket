@@ -1,171 +1,169 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using MockSocket.Core.Commands;
-using MockSocket.Core.Configurations;
-using MockSocket.Core.Exceptions;
-using MockSocket.Core.Extensions;
-using MockSocket.Core.Interfaces;
-using MockSocket.Core.Services;
-using MockSocket.Core.ValueObject;
+﻿//using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Options;
+//using MockSocket.Core.Commands;
+//using MockSocket.Core.Configurations;
+//using MockSocket.Core.Exceptions;
+//using MockSocket.Core.Extensions;
+//using MockSocket.Core.Interfaces;
+//using MockSocket.Core.Services;
+//using MockSocket.Core.ValueObject;
 
-namespace MockSocket.Agent
-{
-    public class MockAgent : IMockAgent
-    {
-        private readonly MockAgentConfig config;
-        private readonly ILogger<MockAgent> logger;
-        private readonly IPairService pairService;
+//namespace MockSocket.Agent
+//{
+//    public class MockAgent : IMockAgent
+//    {
+//        private readonly MockAgentConfig config;
+//        private readonly ILogger<MockAgent> logger;
+//        private readonly ITcpPairService pairService;
+//        private IMockTcpClient agent = null!;
+//        private ILimitIPService limitIPService;
 
-        private IMockTcpClient agent = null!;
+//        public MockAgent(IOptions<MockAgentConfig> config, ILogger<MockAgent> logger, ITcpPairService pairService, ILimitIPService limitIPService)
+//        {
+//            this.config = config.Value;
+//            this.logger = logger;
+//            this.pairService = pairService;
+//            this.limitIPService = limitIPService;
+//        }
 
-        ILimitIPService limitIPService;
+//        public ValueTask StartAsync(CancellationToken cancellationToken = default)
+//        {
+//            var core = StartCoreAsync;
 
-        public MockAgent(IOptions<MockAgentConfig> config, ILogger<MockAgent> logger, IPairService pairService, ILimitIPService limitIPService)
-        {
-            this.config = config.Value;
-            this.logger = logger;
-            this.pairService = pairService;
-            this.limitIPService = limitIPService;
-        }
+//            return core.WithRetryAsync(cancellationToken: cancellationToken);
+//        }
 
-        public ValueTask StartAsync(CancellationToken cancellationToken = default)
-        {
-            var core = StartCoreAsync;
+//        public async ValueTask StartCoreAsync(CancellationToken cancellationToken)
+//        {
+//            var (host, port) = config.MockServer;
 
-            return core.WithRetryAsync(cancellationToken: cancellationToken);
-        }
+//            logger.LogInformation($"正在连接服务器 {config.MockServer} ...");
 
-        public async ValueTask StartCoreAsync(CancellationToken cancellationToken)
-        {
-            var (host, port) = config.RemoteServer;
+//            agent = await TcpSocketFactory.Create(host, port);
 
-            logger.LogInformation($"正在连接服务器 {config.RemoteServer} ...");
+//            logger.LogInformation("连接服务器成功");
 
-            agent = await TcpSocketFactory.Create(host, port);
+//            using var client = agent;
 
-            logger.LogInformation("连接服务器成功");
+//            await CreateAppServerAsync();
 
-            using var client = agent;
+//            var token = RegisterHeartBeat(cancellationToken);
 
-            await CreateAppServerAsync();
+//            var handleTask = HandleNewClientAsync(token);
 
-            var token = RegisterHeartBeat(cancellationToken);
+//            await handleTask;
+//        }
 
-            var handleTask = HandleNewClientAsync(token);
+//        private async Task HandleNewClientAsync(CancellationToken cancellationToken)
+//        {
+//            while (true)
+//            {
+//                var userClientId = await agent.ReceiveCmdAsync<string>();
 
-            await handleTask;
-        }
+//                var connectionId = new ConnectionId(userClientId);
 
-        private async Task HandleNewClientAsync(CancellationToken cancellationToken)
-        {
-            while (true)
-            {
-                var userClientId = await agent.ReceiveCmdAsync<string>();
+//                logger.LogInformation($"userClient connect appPort: {connectionId.LocalEP.Port} with ip ({connectionId.RemoteEP})");
 
-                var connectionId = new ConnectionId(userClientId);
+//                try
+//                {
+//                    var isValid = await limitIPService.ValidAsync(connectionId.RemoteEP.Address);
 
-                logger.LogInformation($"userClient connect appPort: {connectionId.LocalEP.Port} with ip ({connectionId.RemoteEP})");
+//                    if (!isValid)
+//                        continue;
 
-                try
-                {
-                    var isValid = await limitIPService.ValidAsync(connectionId.RemoteEP.Address);
+//                    var realClient = await CreateRealClientAsync();
 
-                    if (!isValid)
-                        continue;
+//                    var dataClient = await CreateDataClientAsync(userClientId);
 
-                    var realClient = await CreateRealClientAsync();
+//                    _ = pairService.PairAsync(realClient, dataClient, cancellationToken);
+//                }
+//                catch (Exception e)
+//                {
+//                    logger.LogError($"userClient {userClientId} handle error", e);
+//                }
+//            }
+//        }
 
-                    var dataClient = await CreateDataClientAsync(userClientId);
+//        private async ValueTask<IMockTcpClient> CreateDataClientAsync(string userClientId)
+//        {
+//            var (host, port) = config.MockServer;
 
-                    _ = pairService.PairAsync(realClient, dataClient, cancellationToken);
-                }
-                catch (Exception e)
-                {
-                    logger.LogError($"userClient {userClientId} handle error", e);
-                }
-            }
-        }
+//            var connection = await TcpSocketFactory.Create(host, port);
 
-        private async ValueTask<IMockTcpClient> CreateDataClientAsync(string userClientId)
-        {
-            var (host, port) = config.RemoteServer;
+//            await connection.SendCmdAsync(new DataClientCmd(userClientId));
 
-            var connection = await TcpSocketFactory.Create(host, port);
+//            return connection;
+//        }
 
-            await connection.SendCmdAsync(new DataClientCmd(userClientId));
+//        private ValueTask<IMockTcpClient> CreateRealClientAsync()
+//        {
+//            var (host, port) = config.RealServer;
 
-            return connection;
-        }
+//            return TcpSocketFactory.Create(host, port);
+//        }
 
-        private ValueTask<IMockTcpClient> CreateRealClientAsync()
-        {
-            var (host, port) = config.RealServer;
+//        private async ValueTask CreateAppServerAsync()
+//        {
+//            var appServer = config.AppServer;
 
-            return TcpSocketFactory.Create(host, port);
-        }
+//            await agent.SendCmdAsync(new CreateAppServerCmd(appServer.Port, appServer.Protocal));
 
-        private async ValueTask CreateAppServerAsync()
-        {
-            var appServer = config.AppServer;
+//            var isOk = await agent.ReceiveCmdAsync<bool>()
+//                        .TimeoutAsync(() => false);
 
-            await agent.SendCmdAsync(new CreateAppServerCmd(appServer.Port, appServer.Protocal));
+//            if (!isOk)
+//                throw new AppServerException($"无法监听: {config.AppServer}");
 
-            var isOk = await agent.ReceiveCmdAsync<bool>()
-                        .TimeoutAsync(() => false);
+//            var appServerEP = $"{config.AppServer.Protocal}://{config.MockServer.Host}:{config.AppServer.Port}";
 
-            if (!isOk)
-                throw new AppServerException($"无法监听: {config.AppServer}");
+//            var realServerEP = $"{config.AppServer.Protocal}://{config.RealServer}";
 
-            var appServerEP = $"{config.AppServer.Protocal}://{config.RemoteServer.Host}:{config.AppServer.Port}";
+//            logger.LogInformation("创建服务成功，远程服务:{0}, 本地服务:{1}", appServerEP, realServerEP);
+//        }
 
-            var realServerEP = $"{config.AppServer.Protocal}://{config.RealServer}";
+//        private CancellationToken RegisterHeartBeat(CancellationToken token)
+//        {
+//            var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-            logger.LogInformation("创建服务成功，远程服务:{0}, 本地服务:{1}", appServerEP, realServerEP);
-        }
+//            var cancellationToken = cts.Token;
 
-        private CancellationToken RegisterHeartBeat(CancellationToken token)
-        {
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+//            var heartInterval = TimeSpan.FromSeconds(config.HeartInterval);
 
-            var cancellationToken = cts.Token;
+//            _ = HeartBeatAsync(cts, heartInterval, cancellationToken);
 
-            var heartInterval = TimeSpan.FromSeconds(config.HeartInterval);
+//            return cancellationToken;
+//        }
 
-            _ = HeartBeatAsync(cts, heartInterval, cancellationToken);
+//        private async Task HeartBeatAsync(CancellationTokenSource cts, TimeSpan heartInterval, CancellationToken cancellationToken)
+//        {
+//            try
+//            {
+//                while (true)
+//                {
+//                    await agent.SendCmdAsync(new HeartBeatCmd(new { DateTime.Now, heartInterval }.ToString()!));
 
-            return cancellationToken;
-        }
+//                    logger.LogDebug("心跳成功");
 
-        private async Task HeartBeatAsync(CancellationTokenSource cts, TimeSpan heartInterval, CancellationToken cancellationToken)
-        {
-            try
-            {
-                while (true)
-                {
-                    await agent.SendCmdAsync(new HeartBeatCmd(new { DateTime.Now, heartInterval }.ToString()!));
+//                    await Task.Delay(heartInterval, cancellationToken);
+//                }
+//            }
+//            catch (Exception)
+//            {
+//                logger.LogInformation("心跳失败,与服务器断开连接");
 
-                    logger.LogDebug("心跳成功");
+//                cts.Cancel();
 
-                    await Task.Delay(heartInterval, cancellationToken);
-                }
-            }
-            catch (Exception)
-            {
-                logger.LogInformation("心跳失败,与服务器断开连接");
+//                cts.Dispose();
+//            }
+//        }
 
-                cts.Cancel();
+//        public ValueTask StopAsync()
+//        {
+//            agent?.Dispose();
 
-                cts.Dispose();
-            }
-        }
+//            logger.LogInformation("停止服务成功");
 
-        public ValueTask StopAsync()
-        {
-            agent?.Dispose();
-
-            logger.LogInformation("停止服务成功");
-
-            return default;
-        }
-    }
-}
+//            return default;
+//        }
+//    }
+//}

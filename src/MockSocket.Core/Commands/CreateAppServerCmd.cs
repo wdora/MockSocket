@@ -4,5 +4,5 @@
 
     public record class CreateUdpAppServerCmd(int Port) : ICmd;
     
-    public record class UdpDataClientCmd(string userClientId) : ICmd;
+    public record class UdpDataClientCmd(string UserClientId) : ICmd;
 }
