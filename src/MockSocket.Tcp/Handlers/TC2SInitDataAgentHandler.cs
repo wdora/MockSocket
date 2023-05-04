@@ -16,7 +16,7 @@ public class TC2SInitDataAgentHandler : IRequestHandler<TC2SInitDataAgentCmd>
         this.pairService = pairService;
     }
 
-    public async Task Handle(TC2SInitDataAgentCmd request, CancellationToken cancellationToken)
+    public Task Handle(TC2SInitDataAgentCmd request, CancellationToken cancellationToken)
     {
         var agentClient = CurrentContext.Agent.Value!;
 
@@ -25,5 +25,7 @@ public class TC2SInitDataAgentHandler : IRequestHandler<TC2SInitDataAgentCmd>
         _ = pairService.PairAsync(agentClient, userClient, cancellationToken);
 
         cache.Remove(request.UserClientId);
+
+        return Task.CompletedTask;
     }
 }

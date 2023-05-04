@@ -4,6 +4,8 @@ namespace MockClient.Udp.Interfaces;
 
 public class MockAgentConfig
 {
+    public bool Enable { get; set; } = true;
+
     public string MockServerAddress { get; set; } = "127.0.0.1";
 
     public int MockServerPort { get; set; } = 9090;

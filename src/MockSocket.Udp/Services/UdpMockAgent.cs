@@ -37,6 +37,9 @@ public class UdpMockAgent : IMockAgent
     }
     public async ValueTask StartAsync(CancellationToken cancellationToken)
     {
+        if (!config.Enable)
+            return;
+
         var policy = Policy
             .Handle<Exception>(e =>
             {

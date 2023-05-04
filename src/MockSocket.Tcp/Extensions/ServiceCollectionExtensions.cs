@@ -19,10 +19,10 @@ public static class ServiceCollectionExtensions
             .AddTransient<IMockServer, TcpMockServer>()
             .AddTransient<ITcpServer, TcpServer>()
             .AddTransient<ITcpClient, TcpClient>()
-            .AddTransient<IBufferService, BufferService>()
-            .AddTransient<ITcpPairService, TcpPairService>()
-            .AddTransient<IMemorySerializer, MemorySerializer>()
-            .AddTransient<ICancellationTokenService, CancellationTokenService>()
+            .AddSingleton<IBufferService, BufferService>()
+            .AddSingleton<ITcpPairService, TcpPairService>()
+            .AddSingleton<IMemorySerializer, MemorySerializer>()
+            .AddSingleton<ICancellationTokenService, CancellationTokenService>()
             .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
     }
 
@@ -35,10 +35,10 @@ public static class ServiceCollectionExtensions
             .AddTransient<IMockAgent, TcpMockAgent>()
             .AddTransient<ITcpServer, TcpServer>()
             .AddTransient<ITcpClient, TcpClient>()
-            .AddTransient<IBufferService, BufferService>()
-            .AddTransient<ITcpPairService, TcpPairService>()
-            .AddTransient<IMemorySerializer, MemorySerializer>()
-            .AddTransient<ICancellationTokenService, CancellationTokenService>()
+            .AddSingleton<IBufferService, BufferService>()
+            .AddSingleton<ITcpPairService, TcpPairService>()
+            .AddSingleton<IMemorySerializer, MemorySerializer>()
+            .AddSingleton<ICancellationTokenService, CancellationTokenService>()
             .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
     }
 }

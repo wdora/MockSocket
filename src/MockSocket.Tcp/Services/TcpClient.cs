@@ -65,7 +65,7 @@ public class TcpClient : ITcpClient
         return model;
     }
 
-    public async ValueTask<int> ReceiveBytesAsync(BufferResult buffer, CancellationToken cancellationToken)
+    public async ValueTask<int> ReceiveBytesAsync(Memory<byte> buffer, CancellationToken cancellationToken)
     {
         var len = await client.ReceiveAsync(buffer, cancellationToken);
 

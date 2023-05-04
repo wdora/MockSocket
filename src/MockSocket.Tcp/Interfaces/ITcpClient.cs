@@ -11,7 +11,7 @@ public interface ITcpClient : IDisposable
 
     ValueTask<T> ReceiveAsync<T>(CancellationToken cancellationToken);
     
-    ValueTask<int> ReceiveBytesAsync(BufferResult buffer, CancellationToken cancellationToken);
+    ValueTask<int> ReceiveBytesAsync(Memory<byte> buffer, CancellationToken cancellationToken);
 
     ValueTask SendAsync<T>(T model, CancellationToken cancellationToken);
     
