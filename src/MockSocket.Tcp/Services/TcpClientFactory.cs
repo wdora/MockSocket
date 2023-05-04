@@ -14,6 +14,11 @@ public class TcpClientFactory
 
     public ITcpClient Create(Socket socket)
     {
-        return (serviceProvider.GetService<ITcpClient>() as TcpClient)!.WithSocket(socket);
+        return (Create() as TcpClient)!.WithSocket(socket);
+    }
+
+    public ITcpClient Create()
+    {
+        return serviceProvider.GetService<ITcpClient>()!;
     }
 }

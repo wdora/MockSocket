@@ -14,14 +14,15 @@ public class TcpMockAgent : IMockAgent
     MockAgentConfig config;
 
     ITcpClient agent;
-
+    readonly TcpClientFactory agentFactory;
     ISender sender;
 
     ILogger logger;
 
-    public TcpMockAgent(ITcpClient agent, ISender sender, ILogger<TcpMockAgent> logger, IOptions<MockAgentConfig> options)
+    public TcpMockAgent(TcpClientFactory agentFactory, ISender sender, ILogger<TcpMockAgent> logger, IOptions<MockAgentConfig> options)
     {
-        this.agent = agent;
+        this.agentFactory = agentFactory;
+        this.agent = agentFactory.Create();
         this.sender = sender;
         this.logger = logger;
 
@@ -43,15 +44,13 @@ public class TcpMockAgent : IMockAgent
                    return true;
                }
 
-               if (e is TaskCanceledException || e is OperationCanceledException)
-               {
-                   logger.LogInformation($"取消重试");
-                   return true;
-               }
+               agent.Dispose();
+
+               agent = agentFactory.Create();
 
                logger.LogError(e, "Other");
 
-               return false;
+               return true;
            }
            )
            .WaitAndRetryForeverAsync(retryAttempt => TimeSpan.FromSeconds(retryAttempt > 5 ? 60 : Math.Pow(2, retryAttempt)));
