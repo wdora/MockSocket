@@ -21,11 +21,9 @@ public class TC2SInitDataAgentHandler : IRequestHandler<TC2SInitDataAgentCmd>
         var agentClient = CurrentContext.Agent.Value!;
 
         var userClient = cache.Get<ITcpClient>(request.UserClientId)!;
-
-        _ = pairService.PairAsync(agentClient, userClient, cancellationToken);
-
+        
         cache.Remove(request.UserClientId);
 
-        return Task.CompletedTask;
+        return pairService.PairAsync(agentClient, userClient, cancellationToken).AsTask();
     }
 }
