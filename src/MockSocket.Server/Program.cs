@@ -20,4 +20,6 @@ var host = Host
     })
     .Build();
 
-await host.Services.GetService<IMockServer>()!.StartAsync(default);
+var servers = host.Services.GetServices<IMockServer>();
+
+await Task.WhenAny(servers.Select(x => x.StartAsync(default).AsTask()));

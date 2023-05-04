@@ -5,12 +5,13 @@ using MockSocket.Common.Interfaces;
 using NLog.Extensions.Logging;
 using System.Diagnostics;
 using System.Reflection;
+using System.Linq;
 
 class MockHost
 {
     IHost host;
 
-    IMockAgent agent;
+    List<IMockAgent> agents;
 
     public MockHost(string[] args)
     {
@@ -31,7 +32,7 @@ class MockHost
             })
             .Build();
 
-        agent = host.Services.GetService<IMockAgent>()!;
+        agents = host.Services.GetServices<IMockAgent>()!.ToList();
     }
 
     [Conditional("DEBUG")]
@@ -42,7 +43,7 @@ class MockHost
         Environment.SetEnvironmentVariable("DOTNET_" + HostDefaults.EnvironmentKey, Environments.Development);
     }
 
-    public void Start() => agent.StartAsync(default);
+    public void Start() => agents.ForEach(x => x.StartAsync(default));
 
-    public void Stop() => agent.Stop();
+    public void Stop() => agents.ForEach(x => x.Stop());
 }
