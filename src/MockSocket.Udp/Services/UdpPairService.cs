@@ -22,15 +22,23 @@ public class UdpPairService : IUdpPairService
 
     public async Task PairAsync(IUdpClient dataClient, IUdpClient realClient, CancellationToken cancellationToken)
     {
-        logger.LogDebug("{0}<=>{1}开始交换...", dataClient, realClient);
+        logger.LogInformation("{0}<=>{1}开始交换...", dataClient, realClient);
 
-        using var token = cancellationTokenService.CreateToken(cancellationToken, () => logger.LogDebug("{0}<=>{1}交换结束", dataClient, realClient));
+        using var token = cancellationTokenService.CreateToken(cancellationToken, () => logger.LogInformation("{0}<=>{1}交换结束", dataClient, realClient));
 
         var fromTask = ForwardToAsync(dataClient, realClient, token);
 
         var toTask = ForwardToAsync(realClient, dataClient, token);
 
-        await await Task.WhenAny(fromTask, toTask);
+        try
+        {
+            await await Task.WhenAny(fromTask, toTask);
+
+        }
+        catch (System.Exception e)
+        {
+            logger.LogError(e, "udp pair");
+        }
     }
 
     private async Task ForwardToAsync(IUdpClient dataClient, IUdpClient realClient, CancellationToken cancellationToken)

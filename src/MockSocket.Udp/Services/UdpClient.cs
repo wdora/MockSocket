@@ -30,7 +30,7 @@ public class UdpClient : IUdpClient
     public void Connect(IPEndPoint serverEP)
     {
         this.serverEP = serverEP;
-        //udpClient.Bind(anyEP);
+        udpClient.Bind(anyEP);
     }
 
     public async ValueTask<T> ReceiveAsync<T>(CancellationToken cancellationToken)

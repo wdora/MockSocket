@@ -29,14 +29,7 @@ public class TcpPairService : ITcpPairService
 
         var toTask = ForwardAsync(userClient, agentClient, token);
 
-        try
-        {
-            await await Task.WhenAny(fromTask, toTask);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, "交换异常");
-        }
+        await await Task.WhenAny(fromTask, toTask);
     }
 
     private async Task ForwardAsync(ITcpClient fromClient, ITcpClient toClient, CancellationToken cancellationToken)
