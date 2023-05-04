@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using MockSocket.Common.Interfaces;
+using MockSocket.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

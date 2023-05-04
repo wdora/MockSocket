@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MockClient.Udp.Interfaces;
+using MockSocket.Common.Interfaces;
 using NLog.Extensions.Logging;
 using System.Diagnostics;
 using System.Reflection;
@@ -25,7 +25,7 @@ class MockHost
                 var config = hostContext.Configuration;
 
                 services
-                    .AddUdpMockAgent()
+                    .AddTcpMockAgent()
                     .AddMemoryCache()
                     .AddLogging(builder => builder.ClearProviders().AddNLog(config))
                     .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
@@ -43,7 +43,7 @@ class MockHost
         Environment.SetEnvironmentVariable("DOTNET_" + HostDefaults.EnvironmentKey, Environments.Development);
     }
 
-    public void Start() => agent.StartAsync(tokenSource.Token);
+    public void Start() => agent.StartAsync(tokenSource.Token).AsTask().Wait();
 
     public void Stop() => tokenSource.Cancel();
 }

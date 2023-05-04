@@ -3,7 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MockClient.Udp.Interfaces;
+using MockSocket.Common.Interfaces;
 using NLog.Extensions.Logging;
 
 var host = Host
@@ -13,7 +13,7 @@ var host = Host
         var config = context.Configuration;
 
         services
-            .AddUdpMockServer()
+            .AddTcpMockServer()
             .AddMemoryCache()
             .AddLogging(builder => builder.ClearProviders().AddNLog(config));
     })

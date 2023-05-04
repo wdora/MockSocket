@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MockClient.Udp.Interfaces;
+using MockSocket.Common.Interfaces;
 
 public class MockHostService : IHostedService
 {

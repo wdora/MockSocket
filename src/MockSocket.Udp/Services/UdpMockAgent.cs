@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using MockClient.Udp.Interfaces;
+using MockSocket.Common.Exceptions;
 using MockSocket.Common.Interfaces;
 using MockSocket.Udp.Commands;
 using MockSocket.Udp.Exceptions;

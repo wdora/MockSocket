@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Common", "src\Mo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Udp", "src\MockSocket.Udp\MockSocket.Udp.csproj", "{822047E7-066B-4B42-ABF3-84825749A60A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockSocket.Tcp", "src\MockSocket.Tcp\MockSocket.Tcp.csproj", "{B9FB961A-D7E8-4165-B958-493D6B96257B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{822047E7-066B-4B42-ABF3-84825749A60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{822047E7-066B-4B42-ABF3-84825749A60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{822047E7-066B-4B42-ABF3-84825749A60A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9FB961A-D7E8-4165-B958-493D6B96257B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9FB961A-D7E8-4165-B958-493D6B96257B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9FB961A-D7E8-4165-B958-493D6B96257B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9FB961A-D7E8-4165-B958-493D6B96257B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,6 +94,7 @@ Global
 		{EE171F3A-ADEF-4064-A1BF-E56EA89E1F85} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 		{1B0290A7-C52F-4AE9-B2B9-E52DB25B2807} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 		{822047E7-066B-4B42-ABF3-84825749A60A} = {2559AD34-193B-46BD-8308-2B979CDFB193}
+		{B9FB961A-D7E8-4165-B958-493D6B96257B} = {2559AD34-193B-46BD-8308-2B979CDFB193}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {97F367FC-2651-49ED-962F-6A5BC9AA7F5C}

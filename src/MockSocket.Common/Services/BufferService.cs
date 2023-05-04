@@ -1,4 +1,5 @@
 ﻿using MockSocket.Common.Interfaces;
+using MockSocket.Common.Models;
 using System.Buffers;
 
 namespace MockSocket.Common.Services;
