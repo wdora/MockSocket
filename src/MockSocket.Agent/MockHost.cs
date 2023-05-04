@@ -12,8 +12,6 @@ class MockHost
 
     IMockAgent agent;
 
-    CancellationTokenSource tokenSource = new CancellationTokenSource();
-
     public MockHost(string[] args)
     {
         SetEnv();
@@ -25,7 +23,8 @@ class MockHost
                 var config = hostContext.Configuration;
 
                 services
-                    .AddTcpMockAgent()
+                    .AddTcpMockAgent(config.GetSection("MockSocket:Tcp"))
+                    .AddUdpMockAgent(config.GetSection("MockSocket:Udp"))
                     .AddMemoryCache()
                     .AddLogging(builder => builder.ClearProviders().AddNLog(config))
                     .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
@@ -43,7 +42,7 @@ class MockHost
         Environment.SetEnvironmentVariable("DOTNET_" + HostDefaults.EnvironmentKey, Environments.Development);
     }
 
-    public void Start() => agent.StartAsync(tokenSource.Token).AsTask().Wait();
+    public void Start() => agent.StartAsync(default);
 
-    public void Stop() => tokenSource.Cancel();
+    public void Stop() => agent.Stop();
 }

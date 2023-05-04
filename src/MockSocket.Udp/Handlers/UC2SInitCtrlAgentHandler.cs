@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MockClient.Udp.Interfaces;
 using MockSocket.Common.Constants;
 using MockSocket.Common.Interfaces;
@@ -28,11 +29,11 @@ public class UC2SInitCtrlAgentHandler : IRequestHandler<UC2SInitCtrlAgent>
 
     ISender sender;
 
-    MockServerConfig config = new MockServerConfig();
+    MockServerConfig config;
 
     private IPEndPoint agentEP;
 
-    public UC2SInitCtrlAgentHandler(IUdpServer mockUdpServer, ILogger<UC2SInitCtrlAgentHandler> logger, IBufferService bufferService, ICancellationTokenService cancellationTokenService, IMemoryCache memoryCache, ISender sender)
+    public UC2SInitCtrlAgentHandler(IUdpServer mockUdpServer, ILogger<UC2SInitCtrlAgentHandler> logger, IBufferService bufferService, ICancellationTokenService cancellationTokenService, IMemoryCache memoryCache, ISender sender, IOptions<MockServerConfig> options)
     {
         this.udpAppServer = mockUdpServer;
         this.logger = logger;
@@ -42,6 +43,7 @@ public class UC2SInitCtrlAgentHandler : IRequestHandler<UC2SInitCtrlAgent>
         this.sender = sender;
 
         agentEP = CurrentContext.ClientEP;
+        config = options.Value;
     }
 
     public async Task Handle(UC2SInitCtrlAgent request, CancellationToken cancellationToken)

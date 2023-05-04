@@ -13,7 +13,8 @@ var host = Host
         var config = context.Configuration;
 
         services
-            .AddTcpMockServer()
+            .AddTcpMockServer(config)
+            .AddUdpMockServer(config)
             .AddMemoryCache()
             .AddLogging(builder => builder.ClearProviders().AddNLog(config));
     })

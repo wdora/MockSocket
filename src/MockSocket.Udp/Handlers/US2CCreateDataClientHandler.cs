@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Options;
 using MockClient.Udp.Interfaces;
 using MockSocket.Udp.Commands;
 using MockSocket.Udp.Interfaces;
@@ -11,13 +12,15 @@ public class US2CCreateDataClientHandler : IRequestHandler<US2CCreateDataClient>
     readonly IUdpClient dataClient;
     readonly IUdpClient realClient;
     readonly IUdpPairService udpPairService;
-    MockAgentConfig agentConfig = new MockAgentConfig();
+    MockAgentConfig agentConfig;
 
-    public US2CCreateDataClientHandler(IUdpClient dataClient, IUdpClient realClient, IUdpPairService udpPairService)
+    public US2CCreateDataClientHandler(IUdpClient dataClient, IUdpClient realClient, IUdpPairService udpPairService, IOptions<MockAgentConfig> options)
     {
         this.dataClient = dataClient;
         this.realClient = realClient;
         this.udpPairService = udpPairService;
+
+        agentConfig = options.Value;
     }
 
     public async Task Handle(US2CCreateDataClient request, CancellationToken cancellationToken)

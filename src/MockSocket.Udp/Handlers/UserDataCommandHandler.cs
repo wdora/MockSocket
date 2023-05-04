@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MockSocket.Udp.Commands;
 using MockSocket.Udp.Config;
 using MockSocket.Udp.Models;
@@ -16,13 +17,14 @@ public class UserDataCommandHandler : IRequestHandler<UserDataCommand>
     ISender sender;
     ILogger logger;
 
-    MockServerConfig config = new MockServerConfig();
+    MockServerConfig config;
 
-    public UserDataCommandHandler(IMemoryCache cache, ISender sender, ILogger<UserDataCommandHandler> logger)
+    public UserDataCommandHandler(IMemoryCache cache, ISender sender, ILogger<UserDataCommandHandler> logger, IOptions<MockServerConfig> options)
     {
         this.cache = cache;
         this.sender = sender;
         this.logger = logger;
+        config = options.Value;
     }
 
     public async Task Handle(UserDataCommand request, CancellationToken cancellationToken)

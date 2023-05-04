@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using MockSocket.Udp.Commands;
 using MockSocket.Udp.Config;
 using MockSocket.Udp.Utilities;
@@ -12,11 +13,13 @@ public class UC2SHeartBeatHandler : IRequestHandler<UC2SHeartBeat>
 {
     IMemoryCache memoryCache;
 
-    MockServerConfig config = new MockServerConfig();
+    MockServerConfig config;
 
-    public UC2SHeartBeatHandler(IMemoryCache memoryCache)
+    public UC2SHeartBeatHandler(IMemoryCache memoryCache, IOptions<MockServerConfig> options)
     {
         this.memoryCache = memoryCache;
+
+        config = options.Value;
     }
 
     public async Task Handle(UC2SHeartBeat request, CancellationToken cancellationToken)

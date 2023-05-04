@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using MockSocket.Udp.Commands;
 using MockSocket.Udp.Config;
 using MockSocket.Udp.Models;
@@ -15,12 +16,14 @@ public class UC2SInitDataClientHandler : IRequestHandler<UC2SInitDataClient>
 
     ISender sender;
 
-    MockServerConfig config = new MockServerConfig();
+    MockServerConfig config;
 
-    public UC2SInitDataClientHandler(IMemoryCache cache, ISender sender)
+    public UC2SInitDataClientHandler(IMemoryCache cache, ISender sender, IOptions<MockServerConfig> options)
     {
         this.cache = cache;
         this.sender = sender;
+
+        config = options.Value;
     }
 
     public async Task Handle(UC2SInitDataClient request, CancellationToken cancellationToken)

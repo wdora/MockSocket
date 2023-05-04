@@ -5,7 +5,9 @@ namespace MockSocket.Tcp.Interfaces;
 
 public interface ITcpClient : IDisposable
 {
-    ValueTask ConnectAsync(IPEndPoint serverEP);
+    ValueTask ConnectAsync(EndPoint serverEP);
+
+    void EnableKeepAlive();
 
     ValueTask<T> ReceiveAsync<T>(CancellationToken cancellationToken);
     

@@ -98,4 +98,9 @@ public class UdpClient : IUdpClient
     {
         return $"{udpClient.LocalEndPoint}->{serverEP}";
     }
+
+    public void Dispose()
+    {
+        udpClient?.Dispose();
+    }
 }

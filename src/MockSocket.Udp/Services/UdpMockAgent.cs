@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MockClient.Udp.Interfaces;
 using MockSocket.Common.Exceptions;
 using MockSocket.Common.Interfaces;
@@ -15,7 +16,7 @@ namespace MockClient.Udp.Services;
 
 public class UdpMockAgent : IMockAgent
 {
-    MockAgentConfig config = new MockAgentConfig();
+    MockAgentConfig config;
 
     ILogger logger;
 
@@ -25,12 +26,14 @@ public class UdpMockAgent : IMockAgent
 
     ICancellationTokenService cancellationTokenService;
 
-    public UdpMockAgent(ILogger<UdpMockAgent> logger, IUdpClient udpClient, ISender sender, ICancellationTokenService cancellationTokenService)
+    public UdpMockAgent(ILogger<UdpMockAgent> logger, IUdpClient udpClient, ISender sender, ICancellationTokenService cancellationTokenService, IOptions<MockAgentConfig> options)
     {
         this.logger = logger;
         this.udpClient = udpClient;
         this.sender = sender;
         this.cancellationTokenService = cancellationTokenService;
+
+        config = options.Value;
     }
     public async ValueTask StartAsync(CancellationToken cancellationToken)
     {
@@ -116,5 +119,10 @@ public class UdpMockAgent : IMockAgent
             throw new PortConflictException(appPort);
 
         logger.LogInformation($"公网应用服务监听成功: udp://{config.MockServerAddress}:{appPort}");
+    }
+
+    public void Stop()
+    {
+        udpClient.Dispose();
     }
 }

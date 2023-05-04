@@ -1,24 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
-using MockSocket.Common.Interfaces;
+﻿using Microsoft.Extensions.DependencyInjection;
 using MockSocket.Tcp.Interfaces;
 using System.Net.Sockets;
 
 namespace MockSocket.Tcp.Services;
 public class TcpClientFactory
 {
-    readonly ILogger<TcpClient> logger;
-    readonly IBufferService bufferService;
-    readonly IMemorySerializer memorySerializer;
+    readonly IServiceProvider serviceProvider;
 
-    public TcpClientFactory(ILogger<TcpClient> logger, IBufferService bufferService, IMemorySerializer memorySerializer)
+    public TcpClientFactory(IServiceProvider serviceProvider)
     {
-        this.logger = logger;
-        this.bufferService = bufferService;
-        this.memorySerializer = memorySerializer;
+        this.serviceProvider = serviceProvider;
     }
 
     public ITcpClient Create(Socket socket)
     {
-        return new TcpClient(logger, bufferService, memorySerializer).WithSocket(socket);
+        return (serviceProvider.GetService<ITcpClient>() as TcpClient)!.WithSocket(socket);
     }
 }

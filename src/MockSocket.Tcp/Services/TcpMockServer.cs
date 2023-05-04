@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MockSocket.Common.Interfaces;
 using MockSocket.Tcp.Configurations;
 using MockSocket.Tcp.Interfaces;
@@ -8,7 +9,7 @@ using MockSocket.Tcp.Utilities;
 namespace MockSocket.Tcp.Services;
 public class TcpMockServer : IMockServer
 {
-    MockServerConfig config = new MockServerConfig();
+    MockServerConfig config;
 
     ITcpServer mockServer;
 
@@ -18,12 +19,13 @@ public class TcpMockServer : IMockServer
 
     ICancellationTokenService cancellationTokenService;
 
-    public TcpMockServer(ITcpServer mockServer, ILogger<TcpMockServer> logger, ISender sender, ICancellationTokenService cancellationTokenService)
+    public TcpMockServer(ITcpServer mockServer, ILogger<TcpMockServer> logger, ISender sender, ICancellationTokenService cancellationTokenService, IOptions<MockServerConfig> options)
     {
         this.mockServer = mockServer;
         this.logger = logger;
         this.sender = sender;
         this.cancellationTokenService = cancellationTokenService;
+        config = options.Value;
     }
 
     public async ValueTask StartAsync(CancellationToken cancellationToken)

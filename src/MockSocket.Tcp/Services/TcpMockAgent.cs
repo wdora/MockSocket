@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MockSocket.Common.Exceptions;
 using MockSocket.Common.Interfaces;
 using MockSocket.Tcp.Commands;
@@ -10,7 +11,7 @@ using Polly;
 namespace MockSocket.Tcp.Services;
 public class TcpMockAgent : IMockAgent
 {
-    MockAgentConfig config = new MockAgentConfig();
+    MockAgentConfig config;
 
     ITcpClient agent;
 
@@ -18,11 +19,15 @@ public class TcpMockAgent : IMockAgent
 
     ILogger logger;
 
-    public TcpMockAgent(ITcpClient agent, ISender sender, ILogger<TcpMockAgent> logger)
+    public TcpMockAgent(ITcpClient agent, ISender sender, ILogger<TcpMockAgent> logger, IOptions<MockAgentConfig> options)
     {
         this.agent = agent;
         this.sender = sender;
         this.logger = logger;
+
+        config = options.Value;
+
+        logger.LogInformation("当前配置：" + config);
     }
 
     public async ValueTask StartAsync(CancellationToken cancellationToken)
@@ -66,7 +71,9 @@ public class TcpMockAgent : IMockAgent
 
         logger.LogInformation($"公网应用服务监听成功: tcp://{config.MockServerAddress}:{appPort}");
 
-        await await Task.WhenAny(LoopSendAsync(cancellationToken), LoopReceiveAsync(cancellationToken));
+        agent.EnableKeepAlive();
+
+        await LoopReceiveAsync(cancellationToken);
     }
 
     private async Task LoopReceiveAsync(CancellationToken cancellationToken)
@@ -79,15 +86,8 @@ public class TcpMockAgent : IMockAgent
         }
     }
 
-    private async Task LoopSendAsync(CancellationToken cancellationToken)
+    public void Stop()
     {
-        var interval = TimeSpan.FromSeconds(config.HeartInterval);
-
-        while (true)
-        {
-            await agent.SendAsync(new TC2SHeartBeatCmd(), cancellationToken);
-
-            await Task.Delay(interval, cancellationToken);
-        }
+        agent.Dispose();
     }
 }

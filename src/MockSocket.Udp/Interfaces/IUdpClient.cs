@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace MockClient.Udp.Interfaces
 {
-    public interface IUdpClient
+    public interface IUdpClient : IDisposable
     {
         void Connect(IPEndPoint serverEP);
 

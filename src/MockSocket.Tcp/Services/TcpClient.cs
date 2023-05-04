@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MockSocket.Common.Exceptions;
 using MockSocket.Common.Interfaces;
 using MockSocket.Common.Models;
+using MockSocket.Tcp.Configurations;
 using MockSocket.Tcp.Interfaces;
 using System.Net;
 using System.Net.Sockets;
@@ -17,11 +19,14 @@ public class TcpClient : ITcpClient
 
     IMemorySerializer memorySerializer;
 
-    public TcpClient(ILogger<TcpClient> logger, IBufferService bufferService, IMemorySerializer memorySerializer)
+    CommonConfig config;
+
+    public TcpClient(ILogger<TcpClient> logger, IBufferService bufferService, IMemorySerializer memorySerializer, IOptions<CommonConfig> config)
     {
         this.logger = logger;
         this.bufferService = bufferService;
         this.memorySerializer = memorySerializer;
+        this.config = config.Value;
     }
 
     public TcpClient WithSocket(Socket socket)
@@ -31,7 +36,7 @@ public class TcpClient : ITcpClient
         return this;
     }
 
-    public async ValueTask ConnectAsync(IPEndPoint serverEP)
+    public async ValueTask ConnectAsync(EndPoint serverEP)
     {
         try
         {
@@ -91,5 +96,12 @@ public class TcpClient : ITcpClient
     public override string ToString()
     {
         return $"{client.LocalEndPoint}->{client.RemoteEndPoint}";
+    }
+
+    public void EnableKeepAlive()
+    {
+        client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
+        client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveTime, config.HeartInterval);
+        client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 3);
     }
 }

@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.ServiceProcess;
 using Topshelf;
 
 var rc = HostFactory.Run(x =>
@@ -28,7 +27,7 @@ var rc = HostFactory.Run(x =>
     // Run a callback after installation completes to start the service.
     x.AfterInstall(() =>
     {
-        using var controller = new ServiceController(serviceName);
+        using var controller = new System.ServiceProcess.ServiceController(serviceName);
         controller.Start();
     });
 });

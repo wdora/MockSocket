@@ -21,13 +21,13 @@ public class TcpPairService : ITcpPairService
         using var client1 = agentClient;
         using var client2 = userClient;
 
-        logger.LogDebug("{0}<=>{1}开始交换...", agentClient, userClient);
+        logger.LogInformation("{0}<=>{1}开始交换...", agentClient, userClient);
 
-        using var token = cancellationTokenService.CreateToken(cancellationToken, () => logger.LogDebug("{0}<=>{1}交换结束", agentClient, userClient));
+        using var token = cancellationTokenService.CreateToken(cancellationToken, () => logger.LogInformation("{0}<=>{1}交换结束", agentClient, userClient));
 
-        var fromTask = ForwardAsync(agentClient, userClient, cancellationToken);
+        var fromTask = ForwardAsync(agentClient, userClient, token);
 
-        var toTask = ForwardAsync(userClient, agentClient, cancellationToken);
+        var toTask = ForwardAsync(userClient, agentClient, token);
 
         await await Task.WhenAny(fromTask, toTask);
     }

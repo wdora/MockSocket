@@ -5,7 +5,7 @@ namespace MockSocket.Common.Exceptions;
 
 public class ServiceUnavailableException : Exception
 {
-    public ServiceUnavailableException(IPEndPoint serverEP) : base(serverEP.ToString())
+    public ServiceUnavailableException(EndPoint serverEP) : base(serverEP.ToString())
     {
 
     }

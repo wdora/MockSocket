@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MockClient.Udp.Interfaces;
 using MockSocket.Common.Constants;
 using MockSocket.Common.Interfaces;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 namespace MockClient.Udp.Services;
 public class UdpMockServer : IMockServer
 {
-    MockServerConfig config = new MockServerConfig();
+    MockServerConfig config;
 
     IUdpServer udpServer;
 
@@ -29,7 +30,7 @@ public class UdpMockServer : IMockServer
 
     IMemoryCache cache;
 
-    public UdpMockServer(IUdpServer udpServer, ILogger<UdpMockServer> logger, IBufferService bufferService, ISender sender, IMemorySerializer memorySerializer, IMemoryCache cache)
+    public UdpMockServer(IUdpServer udpServer, ILogger<UdpMockServer> logger, IBufferService bufferService, ISender sender, IMemorySerializer memorySerializer, IMemoryCache cache, IOptions<MockServerConfig> options)
     {
         this.udpServer = udpServer;
         this.logger = logger;
@@ -37,6 +38,7 @@ public class UdpMockServer : IMockServer
         this.sender = sender;
         this.memorySerializer = memorySerializer;
         this.cache = cache;
+        config = options.Value;
     }
 
     public async ValueTask StartAsync(CancellationToken cancellationToken)

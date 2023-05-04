@@ -12,9 +12,9 @@ public class MockAgentConfig
 
     public int AppServerPort { get; set; } = 10000;
 
-    public IPEndPoint MockServerEP => IPEndPoint.Parse($"{MockServerAddress}:{MockServerPort}");
+    public int HeartInterval { get; set; } = 30;
 
-    public int HeartInterval { get; internal set; } = 30;
+    public IPEndPoint MockServerEP => IPEndPoint.Parse($"{MockServerAddress}:{MockServerPort}");
 
     public IPEndPoint RealServerEP => IPEndPoint.Parse($"127.0.0.1:{RealServerPort}");
 }
