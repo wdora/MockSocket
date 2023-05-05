@@ -33,14 +33,13 @@ public class UC2SInitCtrlAgentHandler : IRequestHandler<UC2SInitCtrlAgent>
 
     private IPEndPoint agentEP;
 
-    public UC2SInitCtrlAgentHandler(IUdpServer mockUdpServer, ILogger<UC2SInitCtrlAgentHandler> logger, IBufferService bufferService, ICancellationTokenService cancellationTokenService, IMemoryCache memoryCache, ISender sender, IOptions<MockServerConfig> options)
+    public UC2SInitCtrlAgentHandler(IUdpServer mockUdpServer, ILogger<UC2SInitCtrlAgentHandler> logger, IBufferService bufferService, ICancellationTokenService cancellationTokenService, IMemoryCache memoryCache, IOptions<MockServerConfig> options)
     {
         this.udpAppServer = mockUdpServer;
         this.logger = logger;
         this.bufferService = bufferService;
         this.cancellationTokenService = cancellationTokenService;
         this.memoryCache = memoryCache;
-        this.sender = sender;
 
         agentEP = CurrentContext.ClientEP;
         config = options.Value;
