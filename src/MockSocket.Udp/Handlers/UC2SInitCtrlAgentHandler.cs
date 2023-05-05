@@ -107,7 +107,7 @@ public class UC2SInitCtrlAgentHandler : IRequestHandler<UC2SInitCtrlAgent>
     {
         var key = clientEP.ToString();
 
-        if (memoryCache.TryGetValue<UserClientContext>(clientEP, out var context))
+        if (memoryCache.TryGetValue<UserClientContext>(key, out var context))
             return context;
 
         logger.LogInformation("{0}配对中...", key);
