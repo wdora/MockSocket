@@ -5,6 +5,10 @@ namespace MockSocket.Tcp.Interfaces;
 
 public interface ITcpClient : IDisposable
 {
+    public string SendId { get; }
+
+    public string ReceiveId { get; }
+
     ValueTask ConnectAsync(EndPoint serverEP);
 
     void EnableKeepAlive();

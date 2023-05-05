@@ -44,7 +44,7 @@ public class TcpServer : ITcpServer
 
             server.Listen();
 
-            logger.LogDebug("Port {port} is now listening.", localEP);
+            logger.LogInformation("Port {port} is now listening.", localEP);
         }
         catch (Exception e)
         {

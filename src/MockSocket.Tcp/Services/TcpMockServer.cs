@@ -32,13 +32,11 @@ public class TcpMockServer : IMockServer
     {
         mockServer.Listen(config.Port);
 
-        logger.LogInformation($"监听端口{config.Port}成功");
-
         while (true)
         {
             var agent = await mockServer.AcceptAsync(cancellationToken);
 
-            logger.LogInformation("有新的Agent {Agent}请求加入", agent);
+            logger.LogInformation("监听到新的连接请求，来自 AgentClient {agent}，正在建立连接 ...", agent.ReceiveId);
 
             _ = LoopAgentAsync(agent, cancellationToken);
         }

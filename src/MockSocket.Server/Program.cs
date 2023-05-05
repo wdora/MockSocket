@@ -6,6 +6,10 @@ using Microsoft.Extensions.Logging;
 using MockSocket.Common.Interfaces;
 using NLog.Extensions.Logging;
 
+#if DEBUG
+Environment.SetEnvironmentVariable("DOTNET_" + HostDefaults.EnvironmentKey, Environments.Development);
+#endif
+
 var host = Host
     .CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>

@@ -17,10 +17,12 @@ public static class ServiceCollectionExtensions
     {
         return services
             .Configure<MockServerConfig>(config)
+            .AddTransient<IUdpClient, UdpClient>() // for mediator handle
             .AddSingleton<IMockServer, UdpMockServer>()
             .AddTransient<IUdpServer, UdpServer>()
             .AddTransient<IMemorySerializer, MemorySerializer>()
             .AddTransient<IBufferService, BufferService>()
+            .AddTransient<IUdpPairService, UdpPairService>()
             .AddTransient<ICancellationTokenService, CancellationTokenService>()
             .AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
     }
