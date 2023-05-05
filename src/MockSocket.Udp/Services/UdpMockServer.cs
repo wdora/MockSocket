@@ -7,6 +7,7 @@ using MockSocket.Common.Constants;
 using MockSocket.Common.Interfaces;
 using MockSocket.Udp.Commands;
 using MockSocket.Udp.Config;
+using MockSocket.Udp.Models;
 using MockSocket.Udp.Utilities;
 using System;
 using System.Net;
@@ -58,7 +59,13 @@ public class UdpMockServer : IMockServer
 
             if (cache.TryGetValue<string>(result.clientEP.ToString(), out var userClientId))
             {
-                await sender.Send(new DataClientToUserClientCmd(userClientId, buffer, result.length));
+                if (!cache.TryGetValue<UserClientContext>(userClientId, out var context))
+                {
+                    logger.LogDebug("异常 数据{IP}", userClientId);
+                    return;
+                }
+
+                await context.AppServer.SendToAsync(context.UserClientEP, buffer.SliceTo(result.length), cancellationToken);
 
                 continue;
             }
