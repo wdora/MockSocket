@@ -2,7 +2,7 @@
 
 namespace MockClient.Udp.Interfaces;
 
-public class MockAgentConfig
+public record class MockAgentConfig
 {
     public bool Enable { get; set; } = true;
 

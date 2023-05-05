@@ -34,12 +34,11 @@ public class UdpMockAgent : IMockAgent
         this.cancellationTokenService = cancellationTokenService;
 
         config = options.Value;
+
+        logger.LogInformation("当前配置：" + config);
     }
     public async ValueTask StartAsync(CancellationToken cancellationToken)
     {
-        if (!config.Enable)
-            return;
-
         var policy = Policy
             .Handle<Exception>(e =>
             {
