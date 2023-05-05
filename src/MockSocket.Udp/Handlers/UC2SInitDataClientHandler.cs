@@ -42,6 +42,6 @@ public class UC2SInitDataClientHandler : IRequestHandler<UC2SInitDataClient>
             return request.UserClientId;
         });
 
-        await sender.Send(new UserClientToDataClientCmd(request.UserClientId));
+        //await sender.Send(new UserClientToDataClientCmd(request.UserClientId));
     }
 }
