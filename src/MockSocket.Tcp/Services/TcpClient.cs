@@ -80,7 +80,7 @@ public class TcpClient : ITcpClient
         var len = await client.ReceiveAsync(buffer, cancellationToken);
 
         if (len == 0)
-            throw new ConnectionAbortedException(ReceiveId.ToString()!);
+            throw new ConnectionAbortedException(ReceiveId!);
 
         logger.LogDebug("{id} received bytes: {len}", ReceiveId, len);
 
