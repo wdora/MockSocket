@@ -10,6 +10,7 @@ using MockSocket.Udp.Config;
 using MockSocket.Udp.Utilities;
 using System;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -65,6 +66,8 @@ public class UdpMockServer : IMockServer
             CurrentContext.ClientEP = result.clientEP;
 
             var cmd = memorySerializer.Deserialize<ICmd>(buffer.SliceTo(result.length).Span);
+
+            logger.LogDebug("Received data from {IP}: {Data}", result.clientEP, cmd);
 
             await sender.Send(cmd as object, cancellationToken);
         }

@@ -8,7 +8,9 @@ using MockSocket.Common.Interfaces;
 using MockSocket.Udp.Commands;
 using MockSocket.Udp.Config;
 using MockSocket.Udp.Exceptions;
+using MockSocket.Udp.Models;
 using MockSocket.Udp.Utilities;
+using Polly;
 using System;
 using System.Net;
 using System.Threading;
@@ -26,8 +28,6 @@ public class UC2SInitCtrlAgentHandler : IRequestHandler<UC2SInitCtrlAgent>
     IMemoryCache memoryCache;
 
     ICancellationTokenService cancellationTokenService;
-
-    ISender sender;
 
     MockServerConfig config;
 
@@ -84,13 +84,47 @@ public class UC2SInitCtrlAgentHandler : IRequestHandler<UC2SInitCtrlAgent>
 
     private async Task LoopUserClientAsync(CancellationToken cancellationToken)
     {
+        using var buffer = bufferService.Rent(BufferSizes.Udp);
+
         while (true)
         {
-            var buffer = bufferService.Rent(BufferSizes.Udp);
-
             var response = await udpAppServer.ReceiveFromAsync(buffer, cancellationToken);
 
-            await sender.Send(new UserDataCommand(buffer, response.length, response.clientEP, agentEP, udpAppServer));
+            try
+            {
+                UserClientContext context = await WaitPairDataAgentAsync(response.clientEP, cancellationToken);
+
+                await CurrentContext.MockServer.SendToAsync(context.DataClientEP, buffer.SliceTo(response.length), cancellationToken);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "loop user");
+            }
+
         }
+    }
+
+    private async ValueTask<UserClientContext> WaitPairDataAgentAsync(IPEndPoint clientEP, CancellationToken cancellationToken)
+    {
+        var key = clientEP.ToString();
+
+        if (memoryCache.TryGetValue<UserClientContext>(clientEP, out var context))
+            return context;
+
+        logger.LogInformation("{0}配对中...", key);
+
+        await CurrentContext.MockServer.SendAsync(agentEP, new US2CCreateDataClient(key), cancellationToken);
+
+        var tcs = new TaskCompletionSource<IPEndPoint>();
+
+        memoryCache.Set(key, tcs);
+
+        var dataClientEP = await tcs.Task;
+
+        logger.LogInformation("{0} 与 {1}配对成功...", key, dataClientEP);
+
+        context = new UserClientContext(udpAppServer, clientEP, dataClientEP);
+
+        return memoryCache.Set(key, context, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromSeconds(config.ExpireUdpTime) })!;
     }
 }

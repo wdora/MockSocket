@@ -57,15 +57,9 @@ public class UdpMockAgent : IMockAgent
                     return true;
                 }
 
-                if (e is TaskCanceledException || e is OperationCanceledException)
-                {
-                    logger.LogInformation($"取消重试");
-                    return true;
-                }
-
                 logger.LogError(e, "Other");
 
-                return false;
+                return true;
             }
             )
             .WaitAndRetryForeverAsync(retryAttempt => TimeSpan.FromSeconds(retryAttempt > 5 ? 60 : Math.Pow(2, retryAttempt)));

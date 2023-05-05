@@ -22,13 +22,15 @@ public class UC2SHeartBeatHandler : IRequestHandler<UC2SHeartBeat>
         config = options.Value;
     }
 
-    public async Task Handle(UC2SHeartBeat request, CancellationToken cancellationToken)
+    public Task Handle(UC2SHeartBeat request, CancellationToken cancellationToken)
     {
         var exp = TimeSpan.FromSeconds(request.Interval + config.HeartInterval);
 
         memoryCache.Set(CurrentContext.ClientEP, true, exp);
 
-        await CurrentContext.MockServer.SendAsync(CurrentContext.ClientEP, new US2CHeartBeat(), cancellationToken);
+        return Task.CompletedTask;
+
+        //await CurrentContext.MockServer.SendAsync(CurrentContext.ClientEP, new US2CHeartBeat(), cancellationToken);
     }
 }
 

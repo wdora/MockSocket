@@ -6,6 +6,7 @@ using MockSocket.Udp.Config;
 using MockSocket.Udp.Models;
 using MockSocket.Udp.Utilities;
 using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -32,9 +33,9 @@ public class UC2SInitDataClientHandler : IRequestHandler<UC2SInitDataClient>
 
         cache.GetOrCreate(dataClient.ToString(), entry =>
         {
-            var context = cache.Get<UserClientContext>(request.UserClientId);
+            var tcs = cache.Get<TaskCompletionSource<IPEndPoint>>(request.UserClientId);
 
-            context.DataClientEP = dataClient;
+            tcs.SetResult(dataClient);
 
             entry.SlidingExpiration = TimeSpan.FromSeconds(config.ExpireUdpTime);
 

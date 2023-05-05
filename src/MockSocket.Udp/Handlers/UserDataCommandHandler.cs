@@ -7,6 +7,7 @@ using MockSocket.Udp.Config;
 using MockSocket.Udp.Models;
 using MockSocket.Udp.Utilities;
 using System;
+using System.Collections;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,11 +41,16 @@ public class UserDataCommandHandler : IRequestHandler<UserDataCommand>
 
             entry.RegisterPostEvictionCallback((k, v, r, s) => logger.LogInformation("{k} 由于{r}，被自动移除", k, r));
 
-            return new UserClientContext(request.udpAppServer, request.UserClientEP);
+            return new UserClientContext(request.udpAppServer, request.UserClientEP, default);
         });
 
-        context.Queue!.Enqueue(new ByteArray(request.Buffer, request.Length));
+        if (context.DataClientEP == default)
+        {
+            context.Queue!.Enqueue(new ByteArray(request.Buffer, request.Length));
 
-        await sender.Send(new UserClientToDataClientCmd(key));
+            await sender.Send(new UserClientToDataClientCmd(key));
+
+            return;
+        }
     }
 }
