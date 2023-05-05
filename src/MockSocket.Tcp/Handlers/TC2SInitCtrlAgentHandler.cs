@@ -39,7 +39,7 @@ public class TC2SInitCtrlAgentHandler : IRequestHandler<TC2SInitCtrlAgentCmd>
         {
             var client = await appServer.AcceptAsync(cancellationToken);
 
-            var clientId = client.ReceiveId!;
+            var clientId = client.ToString()!;
 
             logger.LogInformation("监听到新的连接请求，来自 UserClient {agent}，正在建立连接 ...", clientId);
 

@@ -24,8 +24,9 @@ public class TcpClient : ITcpClient
     Lazy<string> receiver;
 
     public string SendId => sender.Value;
-
     public string ReceiveId => receiver.Value;
+
+    bool isAccepted;
 
     public TcpClient(ILogger<TcpClient> logger, IBufferService bufferService, IMemorySerializer memorySerializer, IOptions<CommonConfig> config)
     {
@@ -41,6 +42,7 @@ public class TcpClient : ITcpClient
     public TcpClient WithSocket(Socket socket)
     {
         client = socket;
+        isAccepted = true;
         return this;
     }
 
@@ -110,5 +112,10 @@ public class TcpClient : ITcpClient
         client.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.TcpKeepAliveRetryCount, 3);
 
         logger.LogInformation("{id} enable KeepAlive", SendId);
+    }
+
+    public override string ToString()
+    {
+        return isAccepted ? ReceiveId : SendId;
     }
 }

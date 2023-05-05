@@ -36,7 +36,7 @@ public class TcpMockServer : IMockServer
         {
             var agent = await mockServer.AcceptAsync(cancellationToken);
 
-            logger.LogInformation("监听到新的连接请求，来自 AgentClient {agent}，正在建立连接 ...", agent.ReceiveId);
+            logger.LogInformation("监听到新的连接请求，来自 AgentClient {agent}，正在建立连接 ...", agent);
 
             _ = LoopAgentAsync(agent, cancellationToken);
         }
