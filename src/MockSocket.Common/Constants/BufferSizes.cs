@@ -2,6 +2,6 @@
 
 public static class BufferSizes
 {
-    public const int Tcp = 1024;
+    public const int Tcp = 4096;
     public const int Udp = 65536;
 }
