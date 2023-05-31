@@ -38,25 +38,24 @@ public class TcpMockAgent : IMockAgent
 
         var policy = Policy
            .Handle<Exception>(e =>
-           {
-               e = e.InnerException ?? e;
-
-               if (e is ServiceUnavailableException)
                {
-                   logger.LogInformation($"{config.MockServerEP} 服务不可用");
+                   e = e.InnerException ?? e;
+
+                   if (e is ServiceUnavailableException)
+                   {
+                       logger.LogInformation($"{config.MockServerEP} 服务不可用");
+                       return true;
+                   }
+
+                   agent.Dispose();
+
+                   agent = agentFactory.Create();
+
+                   logger.LogError(e, "Other");
+
                    return true;
-               }
-
-               agent.Dispose();
-
-               agent = agentFactory.Create();
-
-               logger.LogError(e, "Other");
-
-               return true;
-           }
-           )
-           .WaitAndRetryForeverAsync(retryAttempt => TimeSpan.FromSeconds(retryAttempt > 5 ? 60 : Math.Pow(2, retryAttempt)));
+               })
+           .WaitAndRetryForeverAsync(i => TimeSpan.FromSeconds(3));
 
         await policy.ExecuteAsync(StartCoreAsync, cancellationToken);
     }
