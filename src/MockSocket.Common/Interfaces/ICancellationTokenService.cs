@@ -14,6 +14,8 @@ public class TokenResult : IDisposable
 {
     private CancellationTokenSource cancellationTokenSource;
 
+    bool isStop;
+
     public TokenResult(CancellationTokenSource cancellationTokenSource)
     {
         this.cancellationTokenSource = cancellationTokenSource;
@@ -21,9 +23,14 @@ public class TokenResult : IDisposable
 
     public void Dispose()
     {
-        cancellationTokenSource.Cancel();
+        if (!isStop)
+        {
+            isStop = true;
 
-        cancellationTokenSource.Dispose();
+            cancellationTokenSource.Cancel();
+
+            cancellationTokenSource.Dispose();
+        }
     }
 
     public static implicit operator CancellationTokenSource(TokenResult result) => result.cancellationTokenSource;

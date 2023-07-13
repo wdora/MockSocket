@@ -48,6 +48,8 @@ public class TcpMockServer : IMockServer
 
         using var token = cancellationTokenService.CreateToken(cancellationToken, agent.Dispose);
 
+        agent.RegisterClosed(token.Dispose, token);
+
         while (true)
         {
             var cmd = await agent.ReceiveAsync<ICmd>(token);

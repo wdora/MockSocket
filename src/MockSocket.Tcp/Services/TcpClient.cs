@@ -118,4 +118,38 @@ public class TcpClient : ITcpClient
     {
         return isAccepted ? ReceiveId : SendId;
     }
+
+    public void RegisterClosed(Action dispose, CancellationToken cancellationToken)
+    {
+        Task.Factory.StartNew(async () =>
+        {
+            while (true)
+            {
+                await Task.Delay(100);
+
+                var isConnect = IsConnected(client);
+
+                if (!isConnect)
+                {
+                    logger.LogInformation("{id} is disconnected", this);
+
+                    dispose();
+                    return;
+                }
+            }
+        }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+    }
+
+    public bool IsConnected(Socket so)
+    {
+        try
+        {
+            return !(so.Poll(1, SelectMode.SelectRead) && so.Available == 0);
+        }
+        catch (Exception)
+        {
+            // 如：System.ObjectDisposedException: Cannot access a disposed object
+            return false;
+        }
+    }
 }

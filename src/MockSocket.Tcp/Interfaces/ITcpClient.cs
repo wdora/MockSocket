@@ -1,5 +1,4 @@
-﻿using MockSocket.Common.Models;
-using System.Net;
+﻿using System.Net;
 
 namespace MockSocket.Tcp.Interfaces;
 
@@ -12,6 +11,8 @@ public interface ITcpClient : IDisposable
     ValueTask<T> ReceiveAsync<T>(CancellationToken cancellationToken);
     
     ValueTask<int> ReceiveBytesAsync(Memory<byte> buffer, CancellationToken cancellationToken);
+    
+    void RegisterClosed(Action dispose, CancellationToken cancellationToken);
 
     ValueTask SendAsync<T>(T model, CancellationToken cancellationToken);
     
