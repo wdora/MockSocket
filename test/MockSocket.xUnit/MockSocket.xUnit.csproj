@@ -26,7 +26,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\MockSocket.Agent\MockSocket.Agent.csproj" />
-		<ProjectReference Include="..\..\src\MockSocket\MockSocket.csproj" />
 	</ItemGroup>
 
 </Project>
