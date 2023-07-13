@@ -54,6 +54,8 @@ public class TcpServer : ITcpServer
         catch (Exception e)
         {
             logger.LogError(e, "Listen error");
+
+            throw;
         }
 
     }
