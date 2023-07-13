@@ -70,6 +70,11 @@ public class TcpMockAgent : IMockAgent
 
         await agent.SendAsync(new TC2SInitCtrlAgentCmd(appPort), cancellationToken);
 
+        var status = await agent.ReceiveAsync<StatusCmd>(cancellationToken);
+
+        if (!status.IsOk)
+            throw new Exception($"公网应用端口 {appPort} 被占用");
+
         logger.LogInformation($"公网应用服务监听成功: tcp://{config.MockServerAddress}:{appPort}");
 
         agent.EnableKeepAlive();

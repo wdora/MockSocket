@@ -22,13 +22,24 @@ public class TC2SInitCtrlAgentHandler : IRequestHandler<TC2SInitCtrlAgentCmd>
         agent = CurrentContext.Agent.Value!;
     }
 
-    public Task Handle(TC2SInitCtrlAgentCmd request, CancellationToken cancellationToken)
+    public async Task Handle(TC2SInitCtrlAgentCmd request, CancellationToken cancellationToken)
     {
-        appServer.Listen(request.Port);
+        try
+        {
+            appServer.Listen(request.Port);
+
+            await agent.SendAsync(new StatusCmd(true), cancellationToken);
+        }
+        catch (Exception)
+        {
+            await agent.SendAsync(new StatusCmd(false), cancellationToken);
+
+            logger.LogInformation("{client} request port {port} is already in use!!", agent.ToString(), request.Port);
+
+            return;
+        }
 
         _ = LoopAsync(cancellationToken);
-
-        return Task.CompletedTask;
     }
 
     private async Task LoopAsync(CancellationToken cancellationToken)
