@@ -32,7 +32,12 @@ public class TcpServer : ITcpServer
         return clientFactory.Create(client);
     }
 
-    public void Dispose() => server.Dispose();
+    public void Dispose()
+    {
+        logger.LogInformation("Port {port} is now disposing.", server.LocalEndPoint);
+
+        server.Dispose();
+    }
 
     public void Listen(int port)
     {
@@ -50,7 +55,7 @@ public class TcpServer : ITcpServer
         {
             logger.LogError(e, "Listen error");
         }
-       
+
     }
 
     public async ValueTask<T> ReceiveAsync<T>(CancellationToken cancellationToken)
@@ -59,6 +64,6 @@ public class TcpServer : ITcpServer
 
         var length = await server.ReceiveAsync(buffer, cancellationToken);
 
-         return memorySerializer.Deserialize<T>(buffer.SliceTo(length).Span);
+        return memorySerializer.Deserialize<T>(buffer.SliceTo(length).Span);
     }
 }
