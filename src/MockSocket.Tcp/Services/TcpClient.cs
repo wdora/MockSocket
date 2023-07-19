@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using MockSocket.Common.Exceptions;
 using MockSocket.Common.Interfaces;
 using MockSocket.Tcp.Configurations;
+using MockSocket.Tcp.Extensions;
 using MockSocket.Tcp.Interfaces;
 using System.Net;
 using System.Net.Sockets;
@@ -121,7 +122,7 @@ public class TcpClient : ITcpClient
 
     public void RegisterClosed(Action dispose, CancellationToken cancellationToken)
     {
-        Task.Factory.StartNew(async () =>
+        Task.Run(async () =>
         {
             while (true)
             {
@@ -131,20 +132,20 @@ public class TcpClient : ITcpClient
 
                 if (!isConnect)
                 {
-                    logger.LogInformation("{id} is disconnected", this);
+                    logger.LogInformation("The connection({id}) was found to be closed", this);
 
                     dispose();
                     return;
                 }
             }
-        }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }, cancellationToken);
     }
 
-    public bool IsConnected(Socket so)
+    bool IsConnected(Socket so)
     {
         try
         {
-            return !(so.Poll(1, SelectMode.SelectRead) && so.Available == 0);
+            return so.IsConnected();
         }
         catch (Exception)
         {
