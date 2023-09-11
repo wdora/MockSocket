@@ -148,9 +148,14 @@ public class TcpClient : ITcpClient
             // double check
             return so.IsConnected() || so.IsConnected();
         }
-        catch (Exception)
+        catch (ObjectDisposedException)
         {
-            // 如：System.ObjectDisposedException: Cannot access a disposed object
+            // System.ObjectDisposedException: Cannot access a disposed object
+            return false;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "check connect error");
             return false;
         }
     }
