@@ -130,13 +130,13 @@ public class TcpClient : ITcpClient
 
                 var isConnect = IsConnected(client);
 
-                if (!isConnect)
-                {
-                    logger.LogInformation("The connection({id}) was found to be closed", this);
+                if (isConnect)
+                    continue;
 
-                    dispose();
-                    return;
-                }
+                logger.LogInformation("The connection({id}) was found to be closed", this);
+
+                dispose();
+                return;
             }
         }, cancellationToken);
     }
@@ -145,7 +145,8 @@ public class TcpClient : ITcpClient
     {
         try
         {
-            return so.IsConnected();
+            // double check
+            return so.IsConnected() || so.IsConnected();
         }
         catch (Exception)
         {
