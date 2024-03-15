@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mocksocket-server
+spec:
+  selector:
+    matchLabels:
+      app: mocksocket-server
+  template:
+    metadata:
+      labels:
+        app: mocksocket-server
+    spec:
+      hostNetwork: true
+      containers:
+        - name: mocksocket-server
+          image: wdora/mocksocket-server:0.0.1
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"

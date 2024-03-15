@@ -37,6 +37,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Udp", "src\MockS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSocket.Tcp", "src\MockSocket.Tcp\MockSocket.Tcp.csproj", "{B9FB961A-D7E8-4165-B958-493D6B96257B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shell", "shell", "{FE58A7CC-7F19-4EE4-ACE9-0838616A1A20}"
+	ProjectSection(SolutionItems) = preProject
+		build-mocksocket-server.sh = build-mocksocket-server.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
