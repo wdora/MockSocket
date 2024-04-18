@@ -4,48 +4,48 @@ using MockSocket.Abstractions.Tcp;
 using MockSocket.Core.Exchange;
 using MockSocket.Core.Tcp;
 using MockSocket.HoleClient;
-using System.Net;
 
 namespace MockSocket.Message.Tcp
 {
-    public class ToCtrlAgentNewClientMessage : TcpBaseMessage, IRequest
+    public class AppServer_CtrlAgent_NewClient_Message : TcpBaseMessage, IRequest
     {
         public string ClientId { get; set; } = "";
     }
 
-    public class ToCtrlAgentNewClientHandle : IRequestHandler<ToCtrlAgentNewClientMessage>
+    public class ToCtrlAgentNewClientHandle : IRequestHandler<AppServer_CtrlAgent_NewClient_Message>
     {
         private readonly TcpClientConnectionFactory tcpClientConnectionFactory;
-        private readonly HoleClientOptions options;
+        private readonly ClientOptions options;
         private readonly IExchangeConnection exchangeConnection;
 
-        public ToCtrlAgentNewClientHandle(TcpClientConnectionFactory tcpClientConnectionFactory, IOptions<HoleClientOptions> options, IExchangeConnection exchangeConnection)
+        public ToCtrlAgentNewClientHandle(TcpClientConnectionFactory tcpClientConnectionFactory, IOptions<ClientOptions> options, IExchangeConnection exchangeConnection)
         {
             this.tcpClientConnectionFactory = tcpClientConnectionFactory;
             this.options = options.Value;
             this.exchangeConnection = exchangeConnection;
         }
 
+        public Task<Unit> Handle(AppServer_CtrlAgent_NewClient_Message request, CancellationToken cancellationToken)
+        {
+            _ = SwapAsync(request, cancellationToken);
 
-        public async Task<Unit> Handle(ToCtrlAgentNewClientMessage request, CancellationToken cancellationToken)
+            return Task.FromResult(Unit.Value);
+        }
+
+        private async Task SwapAsync(AppServer_CtrlAgent_NewClient_Message request, CancellationToken cancellationToken)
         {
             var remoteEP = options.HoleServerEP;
             var realServerEP = options.AgentRealServerEP;
 
-            var agentDataClientTask = tcpClientConnectionFactory.CreateAsync(remoteEP, cancellationToken);
-
+            var agentDataClient = await tcpClientConnectionFactory.CreateAsync(remoteEP, cancellationToken);
+            
             var realClientTask = tcpClientConnectionFactory.CreateAsync(realServerEP, cancellationToken);
 
-            await Task.WhenAll(agentDataClientTask.AsTask(), realClientTask.AsTask());
+            await agentDataClient.SendAsync(new DataAgent_HoleServer_Init_Message { UserClientId = request.ClientId });
 
-            var agentDataClient = await agentDataClientTask;
             var realClient = await realClientTask;
 
-            await agentDataClient.SendAsync(new FromDataAgentInitMessage { UserClientId = request.ClientId });
-
             await exchangeConnection.ExchangeAsync(agentDataClient, realClient, cancellationToken);
-
-            return Unit.Value;
         }
     }
 }

@@ -1,26 +1,33 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using MockSocket.HoleClient;
+using Topshelf;
 
-var switchMappings = new Dictionary<string, string>
+var rc = HostFactory.Run(x =>
 {
-    { "-p", "HoleAppServerPort" },
-    { "-rs", "RealServer" },
-    { "-rsp", "RealServerPort" },
-    { "-hs", "HoleServer" },
-    { "-hsp", "HoleServerPort" },
-};
+    x.Service<MockHost>(s =>
+    {
+        s.ConstructUsing(_ => new MockHost(args));
+        s.WhenStarted(h => h.Start());
+        s.WhenStopped(h => h.Stop());
+    });
 
-var config = new ConfigurationBuilder()
-        .AddCommandLine(args, switchMappings)
-        .Build();
+    x.RunAsLocalSystem().StartAutomatically();
 
-var sp = new ServiceCollection()
-                .AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug))
-                .AddHoleClient(config)
-                .BuildServiceProvider();
+    var serviceName = nameof(MockSocket);
 
-await sp.GetService<IHoleClient>()!.ConnectAsync();
+#if DEBUG
+    // 避免与Release版本 svcName 冲突，无法直接调试
+    serviceName = $"{serviceName}Debug";
+#endif
+
+    x.SetServiceName(serviceName);
+    x.SetDisplayName("MockSocket Agent");
+    x.SetDescription("MockSocket Agent is Powered by .NET 7.0");
+
+    // Run a callback after installation completes to start the service.
+    x.AfterInstall(() =>
+    {
+        using var controller = new System.ServiceProcess.ServiceController(serviceName);
+        controller.Start();
+    });
+});

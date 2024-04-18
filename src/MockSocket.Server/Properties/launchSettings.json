@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MockSocket.Server": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

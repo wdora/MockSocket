@@ -1,25 +1,29 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Microsoft.Extensions.Configuration;
+
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MockSocket.HoleServer;
+using MockSocket.Common.Interfaces;
+using NLog.Extensions.Logging;
 
-var switchMappings = new Dictionary<string, string>
-{
-    { "-p", "ListenPort" }
-};
+#if DEBUG
+Environment.SetEnvironmentVariable("DOTNET_" + HostDefaults.EnvironmentKey, Environments.Development);
+#endif
 
-var config = new ConfigurationBuilder()
-        .AddCommandLine(args, switchMappings)
-        .Build();
+var host = Host
+    .CreateDefaultBuilder(args)
+    .ConfigureServices((context, services) =>
+    {
+        var config = context.Configuration;
 
-var sp = new ServiceCollection()
-    .AddHoleServer(config)
-    .AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug))
-    .BuildServiceProvider();
+        services
+            .AddTcpMockServer(config)
+            .AddUdpMockServer(config)
+            .AddMemoryCache()
+            .AddLogging(builder => builder.ClearProviders().AddNLog(config));
+    })
+    .Build();
 
-var tasks = sp.GetServices<IHoleServer>().Select(x => x.StartAsync().AsTask());
+var servers = host.Services.GetServices<IMockServer>();
 
-await Task.WhenAll(tasks);
-
-Console.ReadLine();
+await Task.WhenAny(servers.Select(x => x.StartAsync(default).AsTask()));

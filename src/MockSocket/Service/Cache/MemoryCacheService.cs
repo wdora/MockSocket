@@ -11,7 +11,7 @@ namespace MockSocket.Cache
             cache.AddOrUpdate(key, value!, (k, oldV) => value!);
         }
 
-        public void Delete(string key)
+        public void Remove(string key)
         {
             cache.TryRemove(key, out _);
         }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MockSocket.Abstractions.Tcp;
 using MockSocket.Core.Tcp;
+using MockSocket.Extensions;
 using MockSocket.Message;
 using System.Net;
 
@@ -28,9 +29,11 @@ namespace MockSocket.HoleServer
             this.logger = logger;
         }
 
-        public void Dispose()
+        public void Dispose() => server?.Dispose();
+
+        public ValueTask StartAsync()
         {
-            server.Dispose();
+            return default;
         }
 
         public async ValueTask StartAsync(CancellationToken cancellationToken = default)
@@ -43,23 +46,19 @@ namespace MockSocket.HoleServer
 
             while (true)
             {
-                var client = await server.AcceptAsync(cancellationToken);
+                var agent = await server.AcceptAsync(cancellationToken);
 
-                _ = HandleAgentAsync(client, cancellationToken);
+                _ = HandleAgentAsync(agent, cancellationToken);
             }
         }
 
-        private async ValueTask HandleAgentAsync(ITcpConnection clientConnection, CancellationToken token)
+        private async ValueTask HandleAgentAsync(ITcpConnection agentConnection, CancellationToken cancellationToken)
         {
-            using var client = clientConnection;
-
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-            var cancellationToken = cts.Token;
-            _ = client.HeartBeatAsync(_ => cts.Cancel(), cancellationToken);
+            using var agent = agentConnection;
 
             while (true)
             {
-                var message = await client.GetMessageAsync(cancellationToken);
+                var message = await agent.GetMessageAsync(cancellationToken);
 
                 await mediator.Send(message, cancellationToken);
             }

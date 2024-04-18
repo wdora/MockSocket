@@ -9,7 +9,7 @@ namespace MockSocket.Message
         {
             var raw = await connection.GetStringAsync(cancellationToken);
 
-            var message = BaseMessage.CreateMessage<TcpBaseMessage>(raw);
+            var message = BaseMessage.CreateMessageByDict<TcpBaseMessage>(raw);
 
             message.Connection = connection;
 
