@@ -32,7 +32,9 @@ public class MemorySerializer : IMemorySerializer
     {
         var typeName = typeof(T).AssemblyQualifiedName!;
         var typeLength = Encoding.UTF8.GetByteCount(typeName);
+        
         var data = JsonSerializer.SerializeToUtf8Bytes(obj);
+        
         var dataLength = data.Length;
         var totalLength = sizeof(int) + typeLength + sizeof(int) + dataLength;
 
