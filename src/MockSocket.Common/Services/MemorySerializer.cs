@@ -1,6 +1,7 @@
 ﻿using MockSocket.Common.Interfaces;
 using System.Text;
 using System.Text.Json;
+using CommunityToolkit.HighPerformance.Buffers;
 
 namespace MockSocket.Common.Services;
 /// <summary>
@@ -24,7 +25,7 @@ public class MemorySerializer : IMemorySerializer
         var dataLength = BitConverter.ToInt32(buffer.Slice(index, 4));
 
         index += sizeof(int);
-
+        
         return (T)JsonSerializer.Deserialize(buffer.Slice(index, dataLength), type)!;
     }
 
@@ -33,9 +34,14 @@ public class MemorySerializer : IMemorySerializer
         var typeName = typeof(T).AssemblyQualifiedName!;
         var typeLength = Encoding.UTF8.GetByteCount(typeName);
         
-        var data = JsonSerializer.SerializeToUtf8Bytes(obj);
+        using var writer = new ArrayPoolBufferWriter<byte>(1024 * 4);
         
-        var dataLength = data.Length;
+        using var utf8Writer = new Utf8JsonWriter(writer);
+
+        JsonSerializer.Serialize(utf8Writer, obj);
+        
+        var dataLength = writer.WrittenCount;
+        
         var totalLength = sizeof(int) + typeLength + sizeof(int) + dataLength;
 
         if (buffer.Length < totalLength)
@@ -51,7 +57,7 @@ public class MemorySerializer : IMemorySerializer
         BitConverter.TryWriteBytes(buffer.Slice(offset, sizeof(int)), dataLength);
         offset += sizeof(int);
 
-        data.CopyTo(buffer.Slice(offset));
+        writer.WrittenSpan.CopyTo(buffer.Slice(offset));
 
         return totalLength;
     }
