@@ -7,8 +7,11 @@ using MockSocket.Tcp.Extensions;
 using MockSocket.Tcp.Interfaces;
 using System.Net;
 using System.Net.Sockets;
+using CommunityToolkit.HighPerformance.Buffers;
+using MockSocket.Common.Constants;
 
 namespace MockSocket.Tcp.Services;
+
 public class TcpClient : ITcpClient
 {
     Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -29,7 +32,8 @@ public class TcpClient : ITcpClient
 
     bool isAccepted;
 
-    public TcpClient(ILogger<TcpClient> logger, IBufferService bufferService, IMemorySerializer memorySerializer, IOptions<CommonConfig> config)
+    public TcpClient(ILogger<TcpClient> logger, IBufferService bufferService, IMemorySerializer memorySerializer,
+        IOptions<CommonConfig> config)
     {
         this.logger = logger;
         this.bufferService = bufferService;
@@ -90,11 +94,11 @@ public class TcpClient : ITcpClient
 
     public async ValueTask SendAsync<T>(T model, CancellationToken cancellationToken)
     {
-        using var buffer = bufferService.Rent();
+        using var writer = new ArrayPoolBufferWriter<byte>(BufferSizes.Tcp);
 
-        var len = memorySerializer.Serialize(model, buffer);
+        memorySerializer.Serialize(model, writer);
 
-        await client.SendAsync(buffer.SliceTo(len));
+        await client.SendAsync(writer.WrittenMemory, cancellationToken);
 
         logger.LogInformation("{id} sent data: {model}", SendId, model);
     }
