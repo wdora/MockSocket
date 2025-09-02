@@ -2,8 +2,12 @@ name: 构建并推送 MockSocket.Server Docker 镜像
 
 on:
   push:
-    branches: ["*"]
-    tags: ["v*"]
+    branches: ["**"]
+    tags: ["v**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   REGISTRY: docker.io
