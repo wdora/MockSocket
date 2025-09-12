@@ -84,7 +84,6 @@ jobs:
 
           echo "k8s-mocksocket-server.yml 更新后的镜像配置:"
           grep "image:" k8s-mocksocket-server.yml
-          git pull
 
       - name: 提交 K8s 配置更新
         uses: stefanzweifel/git-auto-commit-action@v6
