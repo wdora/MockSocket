@@ -75,18 +75,12 @@ jobs:
           # 更新 k8s/deploy.yaml
           sed -i "s|image: docker.io/wdora/mocksocket-server:.*|image: $IMAGE_TAG|g" k8s/deploy.yaml
 
-          # 更新 k8s-mocksocket-server.yml
-          sed -i "s|image: docker.io/wdora/mocksocket-server:.*|image: $IMAGE_TAG|g" k8s-mocksocket-server.yml
-
           # 显示更新后的内容
           echo "k8s/deploy.yaml 更新后的镜像配置:"
           grep "image:" k8s/deploy.yaml
-
-          echo "k8s-mocksocket-server.yml 更新后的镜像配置:"
-          grep "image:" k8s-mocksocket-server.yml
 
       - name: 提交 K8s 配置更新
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "🤖 自动更新 K8s deployment 镜像标签到: ${{ steps.update-k8s.outputs.image_tag }}"
-          file_pattern: k8s/deploy.yaml k8s-mocksocket-server.yml
+          file_pattern: k8s/deploy.yaml
