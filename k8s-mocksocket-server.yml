@@ -14,7 +14,7 @@ spec:
       hostNetwork: true
       containers:
         - name: mocksocket-server
-          image: wdora/mocksocket-server:0.0.1
+          image: docker.io/wdora/mocksocket-server:feature-tdd
           resources:
             limits:
               memory: "128Mi"
