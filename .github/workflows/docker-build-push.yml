@@ -10,9 +10,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  IMAGE_NAME: docker.io/wdora/mocksocket-server
   REGISTRY: docker.io
-  IMAGE_NAME: mocksocket-server
   USERNAME: wdora
+  DEPLOY_FILE: k8s/deploy.yaml
 
 jobs:
   build-and-push:
@@ -40,7 +41,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.USERNAME }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -72,15 +73,15 @@ jobs:
           echo "更新镜像标签到: $IMAGE_TAG"
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-          # 更新 k8s/deploy.yaml
-          sed -i "s|image: docker.io/wdora/mocksocket-server:.*|image: $IMAGE_TAG|g" k8s/deploy.yaml
+          # 更新 deploy.yaml
+          sed -i "s|image: ${{ env.IMAGE_NAME }}:.*|image: $IMAGE_TAG|g" ${{ env.DEPLOY_FILE }}
 
           # 显示更新后的内容
-          echo "k8s/deploy.yaml 更新后的镜像配置:"
-          grep "image:" k8s/deploy.yaml
+          echo "${{ env.DEPLOY_FILE }} 更新后的镜像配置:"
+          grep "image:" ${{ env.DEPLOY_FILE }}
 
       - name: 提交 K8s 配置更新
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "🤖 自动更新 K8s deployment 镜像标签到: ${{ steps.update-k8s.outputs.image_tag }}"
-          file_pattern: k8s/deploy.yaml
+          file_pattern: ${{ env.DEPLOY_FILE }}
