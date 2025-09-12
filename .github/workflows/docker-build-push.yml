@@ -48,6 +48,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value={{date 'YYYYMMDD-HHmmss'}}
 
       - name: 构建并推送 Docker 镜像
         uses: docker/build-push-action@v5
@@ -62,6 +63,29 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: 输出镜像摘要
+      - name: 更新 K8s Deployment 镜像标签
         if: github.event_name != 'pull_request'
-        run: echo ${{ steps.build.outputs.digest }}
+        run: |
+          # 获取构建的镜像标签
+          IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n1)
+          echo "更新镜像标签到: $IMAGE_TAG"
+
+          # 更新 k8s/deploy.yaml
+          sed -i "s|image: wdora/mocksocket-server:.*|image: $IMAGE_TAG|g" k8s/deploy.yaml
+
+          # 更新 k8s-mocksocket-server.yml
+          sed -i "s|image: wdora/mocksocket-server:.*|image: $IMAGE_TAG|g" k8s-mocksocket-server.yml
+
+          # 显示更新后的内容
+          echo "k8s/deploy.yaml 更新后的镜像配置:"
+          grep "image:" k8s/deploy.yaml
+
+          echo "k8s-mocksocket-server.yml 更新后的镜像配置:"
+          grep "image:" k8s-mocksocket-server.yml
+          git pull
+
+      - name: 提交 K8s 配置更新
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: "🤖 自动更新 K8s deployment 镜像标签到: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}"
+          file_pattern: k8s/deploy.yaml k8s-mocksocket-server.yml
