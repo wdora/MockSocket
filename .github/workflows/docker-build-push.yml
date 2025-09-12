@@ -65,10 +65,12 @@ jobs:
 
       - name: 更新 K8s Deployment 镜像标签
         if: github.event_name != 'pull_request'
+        id: update-k8s
         run: |
           # 获取构建的镜像标签
           IMAGE_TAG=$(echo "${{ steps.meta.outputs.tags }}" | tail -n1)
           echo "更新镜像标签到: $IMAGE_TAG"
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
           # 更新 k8s/deploy.yaml
           sed -i "s|image: wdora/mocksocket-server:.*|image: $IMAGE_TAG|g" k8s/deploy.yaml
@@ -87,5 +89,5 @@ jobs:
       - name: 提交 K8s 配置更新
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          commit_message: "🤖 自动更新 K8s deployment 镜像标签到: ${{ fromJSON(steps.meta.outputs.json).tags[-1] }}"
+          commit_message: "🤖 自动更新 K8s deployment 镜像标签到: ${{ steps.update-k8s.outputs.image_tag }}"
           file_pattern: k8s/deploy.yaml k8s-mocksocket-server.yml
