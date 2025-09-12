@@ -87,5 +87,5 @@ jobs:
       - name: 提交 K8s 配置更新
         uses: stefanzweifel/git-auto-commit-action@v6
         with:
-          commit_message: "🤖 自动更新 K8s deployment 镜像标签到: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}"
+          commit_message: "🤖 自动更新 K8s deployment 镜像标签到: ${{ fromJSON(steps.meta.outputs.json).tags.at(-1) }}"
           file_pattern: k8s/deploy.yaml k8s-mocksocket-server.yml
