@@ -28,7 +28,7 @@ spec:
         runAsUser: 0
       containers:
         - name: mocksocket
-          image: docker.io/wdora/mocksocket-server:20250912-084343
+          image: docker.io/wdora/mocksocket-server:20251112-092343
           resources:
             requests:
               cpu: 10m
